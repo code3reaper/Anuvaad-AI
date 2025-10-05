@@ -47,8 +47,7 @@ class VideoProcessor:
                 # Extract audio and save as WAV
                 video.audio.write_audiofile(
                     output_path,
-                    logger=None,  # Suppress output
-                    verbose=False
+                    logger=None  # Suppress output
                 )
             
             return output_path
@@ -98,8 +97,7 @@ class VideoProcessor:
                         audio_codec='aac',
                         temp_audiofile='temp-audio.m4a',
                         remove_temp=True,
-                        logger=None,
-                        verbose=False
+                        logger=None
                     )
             
             return output_path
@@ -135,8 +133,7 @@ class VideoProcessor:
                     output_path,
                     codec='libx264',
                     audio_codec='aac',
-                    logger=None,
-                    verbose=False
+                    logger=None
                 )
             
             return output_path

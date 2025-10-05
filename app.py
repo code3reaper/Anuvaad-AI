@@ -144,6 +144,14 @@ def process_video(input_path, source_lang, target_lang, stability, clarity, styl
     progress_bar = st.progress(0)
     status_text = st.empty()
     
+    # Initialize variables for cleanup
+    extracted_audio_path = None
+    speech_audio = None
+    background_audio = None
+    dubbed_audio_path = None
+    synced_audio_path = None
+    final_audio_path = None
+    
     try:
         # Stage 1: Audio Extraction
         status_text.text("🎵 Extracting audio from video...")
