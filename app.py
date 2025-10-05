@@ -23,10 +23,21 @@ st.set_page_config(
 def initialize_services():
     """Initialize all services with API keys"""
     try:
+        gemini_api_key = os.environ.get('GEMINI_API_KEY')
+        elevenlabs_api_key = os.environ.get('ELEVENLABS_API_KEY')
+        
+        if not gemini_api_key:
+            st.error("GEMINI_API_KEY environment variable not set")
+            return None, None, None, None, None
+        
+        if not elevenlabs_api_key:
+            st.error("ELEVENLABS_API_KEY environment variable not set")
+            return None, None, None, None, None
+        
         video_processor = VideoProcessor()
         audio_processor = AudioProcessor()
-        translation_service = TranslationService(api_key="AIzaSyDS5lbJHNI9Ukfn_7yEErAU98QyOCgouhI")
-        dubbing_service = DubbingService(api_key="sk_7fbe8e750e4fe6d7b0ca2153215725275f5d866e43ff892c")
+        translation_service = TranslationService(api_key=gemini_api_key)
+        dubbing_service = DubbingService(api_key=elevenlabs_api_key)
         sync_engine = SyncEngine()
         return video_processor, audio_processor, translation_service, dubbing_service, sync_engine
     except Exception as e:

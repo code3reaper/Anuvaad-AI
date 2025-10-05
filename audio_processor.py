@@ -1,19 +1,23 @@
 import os
 import tempfile
-import whisper
+import speech_recognition as sr
 import numpy as np
 from pydub import AudioSegment
 from pydub.silence import split_on_silence, detect_nonsilent
-import librosa
-import soundfile as sf
+try:
+    import librosa
+    import soundfile as sf
+    LIBROSA_AVAILABLE = True
+except ImportError:
+    LIBROSA_AVAILABLE = False
 from typing import Tuple, Optional, List, Dict
 
 class AudioProcessor:
     """Handles audio processing, separation, and speech recognition"""
     
     def __init__(self):
-        """Initialize audio processor with Whisper model"""
-        self.whisper_model = whisper.load_model("base")
+        """Initialize audio processor with speech recognizer"""
+        self.recognizer = sr.Recognizer()
         
     def separate_audio_components(self, audio_path: str, preserve_background: bool = True) -> Tuple[str, Optional[str], List]:
         """
@@ -86,35 +90,52 @@ class AudioProcessor:
     
     def speech_to_text(self, audio_path: str, language: str) -> Optional[Dict]:
         """
-        Convert speech to text with detailed timing information
+        Convert speech to text with detailed timing information using Google Speech Recognition
         """
         try:
-            # Set language code for Whisper
-            lang_code = "en" if language == "en" else "hi"
+            # Set language code
+            lang_code = "en-US" if language == "en" else "hi-IN"
             
-            # Transcribe with Whisper
-            result = self.whisper_model.transcribe(
-                audio_path,
-                language=lang_code,
-                word_timestamps=True,
-                verbose=False
-            )
+            # Load audio file
+            audio = AudioSegment.from_file(audio_path)
             
-            # Extract segments with timing
-            segments = []
-            for segment in result.get('segments', []):
-                segments.append({
-                    'start': segment['start'],
-                    'end': segment['end'],
-                    'text': segment['text'].strip(),
-                    'words': segment.get('words', [])
-                })
+            # Convert to WAV format if needed
+            wav_path = tempfile.mktemp(suffix='.wav')
+            audio.export(wav_path, format='wav')
             
-            return {
-                'text': result['text'].strip(),
-                'language': result.get('language', lang_code),
-                'segments': segments
-            }
+            # Recognize speech using Google Speech Recognition
+            with sr.AudioFile(wav_path) as source:
+                audio_data = self.recognizer.record(source)
+                
+                try:
+                    # Use Google Speech Recognition (free tier)
+                    text = self.recognizer.recognize_google(audio_data, language=lang_code)
+                    
+                    # Create basic segments (Google API doesn't provide word-level timestamps in free tier)
+                    duration = len(audio) / 1000.0  # Convert to seconds
+                    segments = [{
+                        'start': 0.0,
+                        'end': duration,
+                        'text': text,
+                        'words': []
+                    }]
+                    
+                    # Clean up temp file
+                    if os.path.exists(wav_path):
+                        os.unlink(wav_path)
+                    
+                    return {
+                        'text': text,
+                        'language': language,
+                        'segments': segments
+                    }
+                    
+                except sr.UnknownValueError:
+                    print("Google Speech Recognition could not understand audio")
+                    return None
+                except sr.RequestError as e:
+                    print(f"Could not request results from Google Speech Recognition; {e}")
+                    return None
             
         except Exception as e:
             print(f"Error in speech recognition: {e}")
@@ -231,26 +252,41 @@ class AudioProcessor:
         Adjust speech timing to match target duration while preserving quality
         """
         try:
-            # Load audio with librosa for better time-stretching
-            y, sr = librosa.load(audio_path)
-            
-            # Calculate current duration and stretch ratio
-            current_duration = len(y) / sr
-            stretch_ratio = target_duration / current_duration
-            
-            # Time-stretch the audio
-            if preserve_pitch:
-                # Use phase vocoder for pitch preservation
-                y_stretched = librosa.effects.time_stretch(y, rate=1/stretch_ratio)
+            if LIBROSA_AVAILABLE:
+                # Load audio with librosa for better time-stretching
+                y, sr = librosa.load(audio_path)
+                
+                # Calculate current duration and stretch ratio
+                current_duration = len(y) / sr
+                stretch_ratio = target_duration / current_duration
+                
+                # Time-stretch the audio
+                if preserve_pitch:
+                    # Use phase vocoder for pitch preservation
+                    y_stretched = librosa.effects.time_stretch(y, rate=1/stretch_ratio)
+                else:
+                    # Simple resampling (changes pitch)
+                    y_stretched = librosa.resample(y, orig_sr=sr, target_sr=int(sr*stretch_ratio))
+                
+                # Save stretched audio
+                stretched_path = tempfile.mktemp(suffix='.wav')
+                sf.write(stretched_path, y_stretched, sr)
+                
+                return stretched_path
             else:
-                # Simple resampling (changes pitch)
-                y_stretched = librosa.resample(y, orig_sr=sr, target_sr=sr*stretch_ratio)
-            
-            # Save stretched audio
-            stretched_path = tempfile.mktemp(suffix='.wav')
-            sf.write(stretched_path, y_stretched, sr)
-            
-            return stretched_path
+                # Fallback: use pydub for basic speed adjustment
+                audio = AudioSegment.from_file(audio_path)
+                current_duration = len(audio) / 1000.0
+                speed_ratio = current_duration / target_duration
+                
+                # Adjust frame rate for speed change
+                new_frame_rate = int(audio.frame_rate * speed_ratio)
+                adjusted = audio._spawn(audio.raw_data, overrides={"frame_rate": new_frame_rate})
+                adjusted = adjusted.set_frame_rate(audio.frame_rate)
+                
+                stretched_path = tempfile.mktemp(suffix='.wav')
+                adjusted.export(stretched_path, format='wav')
+                return stretched_path
             
         except Exception as e:
             print(f"Error in timing adjustment: {e}")

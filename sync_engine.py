@@ -1,10 +1,15 @@
 import os
 import tempfile
 from pydub import AudioSegment
-import librosa
-import numpy as np
+try:
+    import librosa
+    import soundfile as sf
+    import numpy as np
+    LIBROSA_AVAILABLE = True
+except ImportError:
+    import numpy as np
+    LIBROSA_AVAILABLE = False
 from typing import List, Dict, Optional
-import soundfile as sf
 
 class SyncEngine:
     """Handles audio-video synchronization and timing alignment"""
@@ -159,6 +164,23 @@ class SyncEngine:
         Detect precise speech timing in audio
         """
         try:
+            if not LIBROSA_AVAILABLE:
+                # Fallback: use basic pydub detection
+                from pydub.silence import detect_nonsilent
+                audio = AudioSegment.from_file(audio_path)
+                
+                nonsilent_ranges = detect_nonsilent(
+                    audio,
+                    min_silence_len=100,
+                    silence_thresh=audio.dBFS - 16
+                )
+                
+                return [{
+                    'start': start / 1000.0,
+                    'end': end / 1000.0,
+                    'duration': (end - start) / 1000.0
+                } for start, end in nonsilent_ranges]
+            
             # Load audio with librosa for better analysis
             y, sr = librosa.load(audio_path)
             
@@ -250,6 +272,24 @@ class SyncEngine:
         Apply dynamic time warping for better synchronization
         """
         try:
+            if not LIBROSA_AVAILABLE:
+                # Fallback: simple duration matching
+                original = AudioSegment.from_file(original_audio_path)
+                dubbed = AudioSegment.from_file(dubbed_audio_path)
+                
+                if len(original) == len(dubbed):
+                    return dubbed_audio_path
+                
+                # Adjust speed to match duration
+                speed_ratio = len(dubbed) / len(original)
+                new_frame_rate = int(dubbed.frame_rate * speed_ratio)
+                adjusted = dubbed._spawn(dubbed.raw_data, overrides={"frame_rate": new_frame_rate})
+                adjusted = adjusted.set_frame_rate(dubbed.frame_rate)
+                
+                output_path = tempfile.mktemp(suffix='.wav')
+                adjusted.export(output_path, format='wav')
+                return output_path
+            
             # Load both audio files
             y1, sr1 = librosa.load(original_audio_path)
             y2, sr2 = librosa.load(dubbed_audio_path)

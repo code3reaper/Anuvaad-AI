@@ -106,11 +106,13 @@ def calculate_processing_time_estimate(video_duration: float) -> str:
 
 def validate_api_keys():
     """
-    Validate that required API keys are available
+    Validate that required API keys are available from environment
     """
+    import os
+    
     required_keys = {
-        'elevenlabs': 'sk_7fbe8e750e4fe6d7b0ca2153215725275f5d866e43ff892c',
-        'gemini': 'AIzaSyDS5lbJHNI9Ukfn_7yEErAU98QyOCgouhI'
+        'elevenlabs': os.environ.get('ELEVENLABS_API_KEY', ''),
+        'gemini': os.environ.get('GEMINI_API_KEY', '')
     }
     
     validation_results = {}

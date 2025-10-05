@@ -4,7 +4,7 @@ integrations = ["python_gemini:1.0.0"]
 
 [nix]
 channel = "stable-25_05"
-packages = ["ffmpeg-full", "imagemagickBig", "libsndfile"]
+packages = ["ffmpeg-full", "imagemagickBig", "libsndfile", "libxcrypt", "pkg-config", "xsimd"]
 
 [deployment]
 deploymentTarget = "autoscale"
@@ -37,3 +37,7 @@ outputType = "webview"
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[[ports]]
+localPort = 34629
+externalPort = 3000
