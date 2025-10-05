@@ -1,7 +1,8 @@
 import os
 import tempfile
 import requests
-from elevenlabs import Client, VoiceSettings
+from elevenlabs.client import ElevenLabs
+from elevenlabs.types.voice_settings import VoiceSettings
 from typing import Optional
 
 class DubbingService:
@@ -9,7 +10,7 @@ class DubbingService:
     
     def __init__(self, api_key: str):
         """Initialize dubbing service with ElevenLabs API"""
-        self.client = Client(api_key=api_key)
+        self.client = ElevenLabs(api_key=api_key)
         
         # Default voice IDs for different languages
         self.default_voices = {
@@ -66,21 +67,20 @@ class DubbingService:
             if not self.current_voice_id:
                 self.select_voice(language)
             
-            # Configure voice settings
-            voice_settings = VoiceSettings(
+            # Generate speech with voice settings
+            voice_settings_obj = VoiceSettings(
                 stability=stability,
                 similarity_boost=clarity,
                 style=style,
                 use_speaker_boost=enhance
             )
             
-            # Generate speech
             response = self.client.text_to_speech.convert(
                 voice_id=self.current_voice_id,
-                optimize_streaming_latency="0",
-                output_format="mp3_44100_128",
                 text=text,
-                voice_settings=voice_settings
+                output_format="mp3_44100_128",
+                model_id="eleven_multilingual_v2",
+                voice_settings=voice_settings_obj
             )
             
             # Save audio to temporary file
@@ -110,14 +110,6 @@ class DubbingService:
             if not self.current_voice_id:
                 self.select_voice(language)
             
-            # Configure voice settings
-            voice_settings = VoiceSettings(
-                stability=stability,
-                similarity_boost=clarity,
-                style=style,
-                use_speaker_boost=True
-            )
-            
             # Generate complete audio
             complete_audio = AudioSegment.empty()
             last_end_time = 0
@@ -140,12 +132,19 @@ class DubbingService:
                     complete_audio += AudioSegment.silent(duration=silence_duration)
                 
                 # Generate speech for this segment
+                voice_settings_obj = VoiceSettings(
+                    stability=stability,
+                    similarity_boost=clarity,
+                    style=style,
+                    use_speaker_boost=True
+                )
+                
                 response = self.client.text_to_speech.convert(
                     voice_id=self.current_voice_id,
-                    optimize_streaming_latency="0",
-                    output_format="mp3_44100_128",
                     text=text,
-                    voice_settings=voice_settings
+                    output_format="mp3_44100_128",
+                    model_id="eleven_multilingual_v2",
+                    voice_settings=voice_settings_obj
                 )
                 
                 # Save segment audio
