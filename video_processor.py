@@ -1,7 +1,9 @@
 import os
 import tempfile
-from moviepy.editor import VideoFileClip, CompositeVideoClip, AudioFileClip
-from moviepy.audio.io.AudioFileClip import AudioFileClip
+try:
+    from moviepy import VideoFileClip, CompositeVideoClip, AudioFileClip
+except ImportError:
+    from moviepy.editor import VideoFileClip, CompositeVideoClip, AudioFileClip
 import ffmpeg
 from typing import Optional, Dict
 
