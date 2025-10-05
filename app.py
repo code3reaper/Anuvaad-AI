@@ -186,18 +186,24 @@ def process_video(input_path, source_lang, target_lang, stability, clarity, styl
         status_text.text("🌐 Translating text...")
         progress_bar.progress(50)
         
-        translated_text = trans_svc.translate_text(
-            transcript_data['text'], 
-            source_lang, 
-            target_lang
-        )
-        
-        if not translated_text:
-            st.error("Failed to translate text")
-            return
+        # Skip translation if same language
+        if source_lang == target_lang:
+            translated_text = transcript_data['text']
+            st.info("Source and target languages are the same - skipping translation")
+        else:
+            translated_text = trans_svc.translate_text(
+                transcript_data['text'], 
+                source_lang, 
+                target_lang
+            )
             
-        st.subheader("Translated Text")
-        st.text_area("Translation", translated_text, height=100)
+            if not translated_text:
+                st.error("⚠️ Translation failed! Your Gemini API key may have exceeded its quota. Please check your Gemini API billing at https://ai.google.dev/")
+                st.warning("Using original text for dubbing instead...")
+                translated_text = transcript_data['text']
+            
+        st.subheader("Translated Text" if source_lang != target_lang else "Original Text")
+        st.text_area("Text for Dubbing", translated_text, height=100)
         
         # Stage 5: Voice Dubbing
         status_text.text("🎙️ Generating dubbed audio...")

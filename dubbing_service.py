@@ -75,11 +75,14 @@ class DubbingService:
                 use_speaker_boost=enhance
             )
             
+            # Use appropriate model based on language
+            model = "eleven_multilingual_v2"
+            
             response = self.client.text_to_speech.convert(
                 voice_id=self.current_voice_id,
                 text=text,
                 output_format="mp3_44100_128",
-                model_id="eleven_multilingual_v2",
+                model_id=model,
                 voice_settings=voice_settings_obj
             )
             
