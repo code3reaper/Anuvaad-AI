@@ -545,7 +545,8 @@ def main():
     
     st.markdown('<div class="content-section">', unsafe_allow_html=True)
     
-    st.markdown('<h2 style="text-align: center; margin: 2rem 0 1.5rem 0;">🎬 Video Dubbing - Main Feature</h2>', unsafe_allow_html=True)
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown('<h2 style="text-align: center; margin: 0 0 1.5rem 0;">🎬 Video Dubbing - Main Feature</h2>', unsafe_allow_html=True)
     
     input_video_path = None
     
@@ -635,6 +636,8 @@ def main():
                 4. Click Start Dubbing
             </div>
         """, unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
     
     st.markdown("---")
     st.markdown('<h2 style="text-align: center; margin: 2rem 0;">Additional Features</h2>', unsafe_allow_html=True)
