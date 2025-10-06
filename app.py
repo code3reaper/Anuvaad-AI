@@ -40,7 +40,7 @@ st.markdown("""
     }
     
     .stApp {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+        background: #0f172a;
     }
     
     .main {
@@ -59,11 +59,11 @@ st.markdown("""
     }
     
     div[data-testid="stVerticalBlockBorderWrapper"] {
-        border: 3px solid rgba(96, 165, 250, 0.6) !important;
+        border: 4px solid rgba(96, 165, 250, 0.9) !important;
         border-radius: 20px !important;
         padding: 2rem !important;
-        background: rgba(30, 41, 59, 0.5) !important;
-        box-shadow: 0 25px 70px rgba(96, 165, 250, 0.25), 0 0 40px rgba(96, 165, 250, 0.1) !important;
+        background: rgba(30, 41, 59, 0.8) !important;
+        box-shadow: 0 0 60px rgba(96, 165, 250, 0.5), 0 0 100px rgba(96, 165, 250, 0.3), 0 25px 70px rgba(0, 0, 0, 0.4) !important;
     }
     
     .header {
@@ -90,7 +90,7 @@ st.markdown("""
     .hero {
         text-align: center;
         padding: 5rem 2rem 3rem 2rem;
-        background: linear-gradient(135deg, rgba(96, 165, 250, 0.1) 0%, rgba(167, 139, 250, 0.1) 100%);
+        background: rgba(96, 165, 250, 0.05);
         border-bottom: 1px solid rgba(148, 163, 184, 0.1);
         margin: 0;
     }
