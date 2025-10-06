@@ -545,7 +545,7 @@ def main():
     
     st.markdown('<div class="content-section">', unsafe_allow_html=True)
     
-    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown('<div class="card" style="border: 2px solid rgba(96, 165, 250, 0.4); box-shadow: 0 25px 70px rgba(96, 165, 250, 0.15);">', unsafe_allow_html=True)
     st.markdown('<h2 style="text-align: center; margin: 0 0 1.5rem 0;">🎬 Video Dubbing - Main Feature</h2>', unsafe_allow_html=True)
     
     input_video_path = None
