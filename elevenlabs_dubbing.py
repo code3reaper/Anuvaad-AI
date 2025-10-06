@@ -37,12 +37,11 @@ class ElevenLabsDubbing:
             
             # Upload video to ElevenLabs for dubbing
             with open(video_path, 'rb') as video_file:
-                response = self.client.dubbing.dub_a_video_or_an_audio_file(
-                    file=video_file,
-                    target_lang=target_code,
-                    source_lang=source_code,
-                    mode="automatic",
-                    name=project_name
+                response = self.client.dubbing.create(
+                    name=project_name,
+                    source_language=source_code,
+                    target_language=target_code,
+                    file=video_file
                 )
             
             dubbing_id = response.dubbing_id
@@ -59,7 +58,7 @@ class ElevenLabsDubbing:
         Returns: {'status': 'dubbing'|'dubbed'|'failed', 'metadata': ...}
         """
         try:
-            metadata = self.client.dubbing.get_dubbing_project_metadata(
+            metadata = self.client.dubbing.get(
                 dubbing_id=dubbing_id
             )
             
@@ -92,7 +91,7 @@ class ElevenLabsDubbing:
                     return False
                 
                 # Get status
-                metadata = self.client.dubbing.get_dubbing_project_metadata(
+                metadata = self.client.dubbing.get(
                     dubbing_id=dubbing_id
                 )
                 
@@ -126,7 +125,7 @@ class ElevenLabsDubbing:
             target_code = self.language_codes.get(target_lang, 'hi')
             
             # Get the dubbed file
-            audio_stream = self.client.dubbing.get_dubbed_file(
+            audio_stream = self.client.dubbing.download(
                 dubbing_id=dubbing_id,
                 language_code=target_code
             )
