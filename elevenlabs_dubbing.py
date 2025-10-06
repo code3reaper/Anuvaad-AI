@@ -38,10 +38,12 @@ class ElevenLabsDubbing:
             # Upload video to ElevenLabs for dubbing
             with open(video_path, 'rb') as video_file:
                 response = self.client.dubbing.create(
-                    name=project_name,
-                    source_language=source_code,
-                    target_language=target_code,
-                    file=video_file
+                    target_lang=target_code,
+                    file=video_file,
+                    mode="automatic",
+                    source_lang=source_code,
+                    num_speakers=1,
+                    name=project_name
                 )
             
             dubbing_id = response.dubbing_id
@@ -125,7 +127,7 @@ class ElevenLabsDubbing:
             target_code = self.language_codes.get(target_lang, 'hi')
             
             # Get the dubbed file
-            audio_stream = self.client.dubbing.download(
+            audio_stream = self.client.dubbing.audio.get(
                 dubbing_id=dubbing_id,
                 language_code=target_code
             )
