@@ -58,6 +58,14 @@ st.markdown("""
         padding: 0 !important;
     }
     
+    div[data-testid="stVerticalBlockBorderWrapper"] {
+        border: 3px solid rgba(96, 165, 250, 0.6) !important;
+        border-radius: 20px !important;
+        padding: 2rem !important;
+        background: rgba(30, 41, 59, 0.5) !important;
+        box-shadow: 0 25px 70px rgba(96, 165, 250, 0.25), 0 0 40px rgba(96, 165, 250, 0.1) !important;
+    }
+    
     .header {
         background: rgba(15, 23, 42, 0.95);
         backdrop-filter: blur(10px);
