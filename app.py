@@ -59,16 +59,18 @@ st.markdown("""
     }
     
     div[data-testid="stVerticalBlockBorderWrapper"] {
-        border: 3px solid transparent !important;
+        border: 4px solid transparent !important;
         border-radius: 24px !important;
         padding: 2.5rem !important;
         background: 
-            linear-gradient(rgba(30, 41, 59, 0.95), rgba(30, 41, 59, 0.95)) padding-box,
+            linear-gradient(135deg, rgba(30, 41, 59, 0.98), rgba(51, 65, 85, 0.98)) padding-box,
             linear-gradient(135deg, #60a5fa, #a78bfa, #ec4899) border-box !important;
         box-shadow: 
-            0 0 50px rgba(96, 165, 250, 0.7),
-            0 0 100px rgba(167, 139, 250, 0.5),
-            0 15px 50px rgba(0, 0, 0, 0.6) !important;
+            0 0 60px rgba(96, 165, 250, 0.8),
+            0 0 120px rgba(167, 139, 250, 0.6),
+            0 20px 60px rgba(0, 0, 0, 0.7),
+            inset 0 1px 0 rgba(96, 165, 250, 0.2) !important;
+        position: relative !important;
     }
     
     .header {
