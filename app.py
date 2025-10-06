@@ -79,6 +79,8 @@ def main():
     # Main content area
     col1, col2 = st.columns([1, 1])
     
+    input_video_path = None
+    
     with col1:
         st.header("Upload Video")
         uploaded_file = st.file_uploader(
@@ -105,14 +107,15 @@ def main():
             st.video(input_video_path)
             
             # Get video info
-            video_info = video_processor.get_video_info(input_video_path)
-            if video_info:
-                st.info(f"Duration: {format_time(video_info['duration'])} | Resolution: {video_info['width']}x{video_info['height']} | FPS: {video_info['fps']:.1f}")
+            if video_processor:
+                video_info = video_processor.get_video_info(input_video_path)
+                if video_info:
+                    st.info(f"Duration: {format_time(video_info['duration'])} | Resolution: {video_info['width']}x{video_info['height']} | FPS: {video_info['fps']:.1f}")
     
     with col2:
         st.header("Processing")
         
-        if uploaded_file is not None and st.button("🚀 Start Dubbing", type="primary"):
+        if uploaded_file is not None and input_video_path is not None and st.button("🚀 Start Dubbing", type="primary"):
             process_video_with_elevenlabs(
                 input_video_path, 
                 source_lang, 

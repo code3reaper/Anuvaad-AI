@@ -67,6 +67,11 @@ class DubbingService:
             if not self.current_voice_id:
                 self.select_voice(language)
             
+            # Ensure voice_id is set
+            voice_id = self.current_voice_id
+            if not voice_id:
+                return None
+            
             # Generate speech with voice settings
             voice_settings_obj = VoiceSettings(
                 stability=stability,
@@ -79,7 +84,7 @@ class DubbingService:
             model = "eleven_multilingual_v2"
             
             response = self.client.text_to_speech.convert(
-                voice_id=self.current_voice_id,
+                voice_id=voice_id,
                 text=text,
                 output_format="mp3_44100_128",
                 model_id=model,
@@ -113,6 +118,11 @@ class DubbingService:
             if not self.current_voice_id:
                 self.select_voice(language)
             
+            # Ensure voice_id is set
+            voice_id = self.current_voice_id
+            if not voice_id:
+                return None
+            
             # Generate complete audio
             complete_audio = AudioSegment.empty()
             last_end_time = 0
@@ -143,7 +153,7 @@ class DubbingService:
                 )
                 
                 response = self.client.text_to_speech.convert(
-                    voice_id=self.current_voice_id,
+                    voice_id=voice_id,
                     text=text,
                     output_format="mp3_44100_128",
                     model_id="eleven_multilingual_v2",

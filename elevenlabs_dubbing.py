@@ -43,7 +43,8 @@ class ElevenLabsDubbing:
                     mode="automatic",
                     source_lang=source_code,
                     num_speakers=1,
-                    name=project_name
+                    name=project_name,
+                    watermark=True
                 )
             
             dubbing_id = response.dubbing_id
