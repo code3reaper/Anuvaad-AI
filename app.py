@@ -4,10 +4,7 @@ import os
 from pathlib import Path
 import time
 from video_processor import VideoProcessor
-from audio_processor import AudioProcessor
-from translation_service import TranslationService
-from dubbing_service import DubbingService
-from sync_engine import SyncEngine
+from elevenlabs_dubbing import ElevenLabsDubbing
 from utils import format_time, validate_video_file
 
 # Set page config
@@ -23,26 +20,19 @@ st.set_page_config(
 def initialize_services():
     """Initialize all services with API keys"""
     try:
-        gemini_api_key = os.environ.get('GEMINI_API_KEY')
         elevenlabs_api_key = os.environ.get('ELEVENLABS_API_KEY')
-        
-        if not gemini_api_key:
-            st.error("GEMINI_API_KEY environment variable not set")
-            return None, None, None, None, None
         
         if not elevenlabs_api_key:
             st.error("ELEVENLABS_API_KEY environment variable not set")
-            return None, None, None, None, None
+            return None, None
         
         video_processor = VideoProcessor()
-        audio_processor = AudioProcessor()
-        translation_service = TranslationService(api_key=gemini_api_key)
-        dubbing_service = DubbingService(api_key=elevenlabs_api_key)
-        sync_engine = SyncEngine()
-        return video_processor, audio_processor, translation_service, dubbing_service, sync_engine
+        dubbing_service = ElevenLabsDubbing(api_key=elevenlabs_api_key)
+        
+        return video_processor, dubbing_service
     except Exception as e:
         st.error(f"Failed to initialize services: {str(e)}")
-        return None, None, None, None, None
+        return None, None
 
 def main():
     st.title("🎬 AI Dubbing Studio")
@@ -54,35 +44,37 @@ def main():
         st.error("Failed to initialize application services. Please check API keys.")
         return
     
-    video_processor, audio_processor, translation_service, dubbing_service, sync_engine = services
+    video_processor, dubbing_service = services
     
     # Sidebar configuration
     with st.sidebar:
         st.header("Configuration")
         
         # Language selection
+        st.subheader("🌍 Languages")
         source_lang = st.selectbox(
             "Source Language",
-            ["en", "hi"],
-            format_func=lambda x: "English" if x == "en" else "Hindi"
+            ["en", "hi", "es", "fr", "de", "it", "pt", "ja", "ko", "zh"],
+            format_func=lambda x: {
+                "en": "English", "hi": "Hindi", "es": "Spanish", 
+                "fr": "French", "de": "German", "it": "Italian",
+                "pt": "Portuguese", "ja": "Japanese", 
+                "ko": "Korean", "zh": "Chinese"
+            }.get(x, x)
         )
         
         target_lang = st.selectbox(
             "Target Language", 
-            ["hi", "en"],
-            format_func=lambda x: "Hindi" if x == "hi" else "English"
+            ["hi", "en", "es", "fr", "de", "it", "pt", "ja", "ko", "zh"],
+            format_func=lambda x: {
+                "en": "English", "hi": "Hindi", "es": "Spanish", 
+                "fr": "French", "de": "German", "it": "Italian",
+                "pt": "Portuguese", "ja": "Japanese", 
+                "ko": "Korean", "zh": "Chinese"
+            }.get(x, x)
         )
         
-        # Voice settings
-        st.subheader("Voice Settings")
-        voice_stability = st.slider("Voice Stability", 0.0, 1.0, 0.75, 0.05)
-        voice_clarity = st.slider("Voice Clarity", 0.0, 1.0, 0.75, 0.05)
-        voice_style = st.slider("Voice Style", 0.0, 1.0, 0.0, 0.05)
-        
-        # Processing options
-        st.subheader("Processing Options")
-        preserve_background = st.checkbox("Preserve Background Audio", value=True)
-        enhance_speech = st.checkbox("Enhance Speech Quality", value=True)
+        st.info("🚀 Powered by ElevenLabs AI Dubbing")
         
     # Main content area
     col1, col2 = st.columns([1, 1])
@@ -121,142 +113,53 @@ def main():
         st.header("Processing")
         
         if uploaded_file is not None and st.button("🚀 Start Dubbing", type="primary"):
-            process_video(
+            process_video_with_elevenlabs(
                 input_video_path, 
                 source_lang, 
                 target_lang,
-                voice_stability,
-                voice_clarity, 
-                voice_style,
-                preserve_background,
-                enhance_speech,
                 video_processor,
-                audio_processor,
-                translation_service,
-                dubbing_service,
-                sync_engine
+                dubbing_service
             )
 
-def process_video(input_path, source_lang, target_lang, stability, clarity, style, preserve_bg, enhance, 
-                 video_proc, audio_proc, trans_svc, dub_svc, sync_eng):
-    """Main video processing pipeline"""
+def process_video_with_elevenlabs(input_path, source_lang, target_lang, video_proc, dub_svc):
+    """Process video using ElevenLabs dubbing API"""
     
     progress_bar = st.progress(0)
     status_text = st.empty()
     
-    # Initialize variables for cleanup
-    extracted_audio_path = None
-    speech_audio = None
-    background_audio = None
-    dubbed_audio_path = None
-    synced_audio_path = None
-    final_audio_path = None
-    
     try:
-        # Stage 1: Audio Extraction
-        status_text.text("🎵 Extracting audio from video...")
+        # Stage 1: Upload to ElevenLabs
+        status_text.text("📤 Uploading video to ElevenLabs...")
         progress_bar.progress(10)
         
-        extracted_audio_path = video_proc.extract_audio(input_path)
-        if not extracted_audio_path:
-            st.error("Failed to extract audio from video")
-            return
+        # Stage 2: Transcribing (shown to user, but happening on ElevenLabs)
+        status_text.text("🗣️ Transcribing speech...")
+        progress_bar.progress(25)
+        time.sleep(1)  # Brief pause for UI
         
-        # Stage 2: Audio Analysis and Separation
-        status_text.text("🔍 Analyzing audio and separating speech from background...")
-        progress_bar.progress(20)
+        # Stage 3: Translating (shown to user, but happening on ElevenLabs)
+        status_text.text(f"🌐 Translating from {source_lang.upper()} to {target_lang.upper()}...")
+        progress_bar.progress(40)
         
-        speech_audio, background_audio, timestamps = audio_proc.separate_audio_components(
-            extracted_audio_path, preserve_background=preserve_bg
-        )
-        
-        # Stage 3: Speech Recognition
-        status_text.text("🗣️ Converting speech to text...")
-        progress_bar.progress(35)
-        
-        transcript_data = audio_proc.speech_to_text(speech_audio, source_lang)
-        if not transcript_data:
-            st.error("Failed to transcribe speech")
-            return
-        
-        st.subheader("Original Transcript")
-        st.text_area("Detected Speech", transcript_data['text'], height=100)
-        
-        # Stage 4: Translation
-        status_text.text("🌐 Translating text...")
+        # Stage 4: AI Dubbing (this is where the actual API call happens)
+        status_text.text("🎙️ Generating AI voice dubbing...")
         progress_bar.progress(50)
         
-        # Skip translation if same language
-        if source_lang == target_lang:
-            translated_text = transcript_data['text']
-            st.info("Source and target languages are the same - skipping translation")
-        else:
-            translated_text = trans_svc.translate_text(
-                transcript_data['text'], 
-                source_lang, 
-                target_lang
-            )
-            
-            if not translated_text:
-                st.error("⚠️ Translation failed! Your Gemini API key may have exceeded its quota. Please check your Gemini API billing at https://ai.google.dev/")
-                st.warning("Using original text for dubbing instead...")
-                translated_text = transcript_data['text']
-            
-        st.subheader("Translated Text" if source_lang != target_lang else "Original Text")
-        st.text_area("Text for Dubbing", translated_text, height=100)
+        def progress_callback(message, percent):
+            status_text.text(message)
+            progress_bar.progress(percent)
         
-        # Stage 5: Voice Dubbing
-        status_text.text("🎙️ Generating dubbed audio...")
-        progress_bar.progress(65)
-        
-        dubbed_audio_path = dub_svc.generate_speech(
-            translated_text,
-            target_lang,
-            stability=stability,
-            clarity=clarity,
-            style=style,
-            enhance=enhance
-        )
-        
-        if not dubbed_audio_path:
-            st.error("Failed to generate dubbed audio")
-            return
-        
-        # Stage 6: Audio Synchronization
-        status_text.text("⚡ Synchronizing audio with video timing...")
-        progress_bar.progress(80)
-        
-        synced_audio_path = sync_eng.synchronize_audio(
-            dubbed_audio_path,
-            transcript_data['segments'],
-            extracted_audio_path
-        )
-        
-        # Stage 7: Background Audio Mixing
-        status_text.text("🎚️ Mixing dubbed speech with background audio...")
-        progress_bar.progress(90)
-        
-        if preserve_bg and background_audio:
-            final_audio_path = audio_proc.mix_audio_tracks(
-                synced_audio_path,
-                background_audio,
-                speech_volume=1.0,
-                background_volume=0.3
-            )
-        else:
-            final_audio_path = synced_audio_path
-        
-        # Stage 8: Final Video Assembly
-        status_text.text("🎬 Creating final dubbed video...")
-        progress_bar.progress(95)
-        
-        output_video_path = video_proc.create_dubbed_video(
+        # Call ElevenLabs dubbing API (this does everything on their servers)
+        dubbed_video_path = dub_svc.dub_video_complete(
             input_path,
-            final_audio_path
+            source_lang,
+            target_lang,
+            progress_callback=progress_callback
         )
         
-        if not output_video_path:
-            st.error("Failed to create final video")
+        if not dubbed_video_path:
+            st.error("❌ Failed to dub video. Please check your ElevenLabs API key and quota.")
+            st.info("Visit https://elevenlabs.io/ to check your account status")
             return
         
         # Complete
@@ -274,44 +177,22 @@ def process_video(input_path, source_lang, target_lang, stability, clarity, styl
         
         with col2:
             st.subheader("Dubbed Video")
-            st.video(output_video_path)
+            st.video(dubbed_video_path)
         
         # Download button
-        with open(output_video_path, 'rb') as f:
+        with open(dubbed_video_path, 'rb') as f:
             st.download_button(
                 label="📥 Download Dubbed Video",
                 data=f.read(),
-                file_name=f"dubbed_{int(time.time())}.mp4",
+                file_name=f"dubbed_{source_lang}_to_{target_lang}_{int(time.time())}.mp4",
                 mime="video/mp4",
                 type="primary"
             )
-        
-        # Audio comparison
-        st.subheader("Audio Comparison")
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.write("**Original Audio**")
-            st.audio(extracted_audio_path)
-        
-        with col2:
-            st.write("**Dubbed Audio**")
-            st.audio(final_audio_path)
             
     except Exception as e:
         st.error(f"Processing failed: {str(e)}")
         progress_bar.progress(0)
         status_text.text("❌ Processing failed")
-    
-    finally:
-        # Cleanup temporary files
-        cleanup_temp_files([
-            extracted_audio_path,
-            speech_audio,
-            dubbed_audio_path,
-            synced_audio_path,
-            final_audio_path
-        ])
 
 def cleanup_temp_files(file_paths):
     """Clean up temporary files"""
