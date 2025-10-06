@@ -312,7 +312,13 @@ st.markdown("""
     }
     
     h1, h2, h3, h4, h5, h6 {
-        color: #f1f5f9;
+        color: #f1f5f9 !important;
+    }
+    
+    h5 {
+        color: #e0e7ff !important;
+        font-weight: 700 !important;
+        margin-bottom: 0.8rem !important;
     }
     
     p {
