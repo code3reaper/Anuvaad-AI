@@ -7,7 +7,6 @@ from video_processor import VideoProcessor
 from elevenlabs_dubbing import ElevenLabsDubbing
 from utils import format_time, validate_video_file
 
-# Set page config
 st.set_page_config(
     page_title="AI Dubbing Studio",
     page_icon="🎬",
@@ -15,15 +14,94 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Initialize services
+st.markdown("""
+    <style>
+    .main {
+        padding: 2rem;
+    }
+    .stApp {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .block-container {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    h1 {
+        color: #1e293b;
+        font-weight: 800;
+        font-size: 3rem !important;
+        margin-bottom: 0.5rem !important;
+        text-align: center;
+    }
+    .subtitle {
+        text-align: center;
+        color: #64748b;
+        font-size: 1.2rem;
+        margin-bottom: 3rem;
+        font-weight: 400;
+    }
+    .upload-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        margin-bottom: 2rem;
+    }
+    .feature-card {
+        background: #f8fafc;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border-left: 4px solid #667eea;
+        margin: 1rem 0;
+    }
+    .stat-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1rem;
+        border-radius: 10px;
+        text-align: center;
+        margin: 0.5rem 0;
+    }
+    .stButton>button {
+        width: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        transition: all 0.3s ease;
+    }
+    .stButton>button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+    .sidebar .sidebar-content {
+        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    .stSelectbox label {
+        font-weight: 600;
+        color: #1e293b;
+    }
+    .stProgress > div > div > div {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 @st.cache_resource
 def initialize_services():
-    """Initialize all services with API keys"""
     try:
         elevenlabs_api_key = os.environ.get('ELEVENLABS_API_KEY')
         
         if not elevenlabs_api_key:
-            st.error("ELEVENLABS_API_KEY environment variable not set")
+            st.error("🔑 ELEVENLABS_API_KEY environment variable not set")
             return None, None
         
         video_processor = VideoProcessor()
@@ -31,128 +109,177 @@ def initialize_services():
         
         return video_processor, dubbing_service
     except Exception as e:
-        st.error(f"Failed to initialize services: {str(e)}")
+        st.error(f"❌ Failed to initialize services: {str(e)}")
         return None, None
 
 def main():
-    st.title("🎬 AI Dubbing Studio")
-    st.markdown("### Professional AI-powered video dubbing with perfect synchronization")
+    st.markdown("<h1>🎬 AI Dubbing Studio</h1>", unsafe_allow_html=True)
+    st.markdown("<p class='subtitle'>Transform your videos into any language with AI-powered voice dubbing</p>", unsafe_allow_html=True)
     
-    # Initialize services
     services = initialize_services()
     if None in services:
-        st.error("Failed to initialize application services. Please check API keys.")
+        st.error("⚠️ Failed to initialize application services. Please check API keys.")
         return
     
     video_processor, dubbing_service = services
     
-    # Sidebar configuration
     with st.sidebar:
-        st.header("Configuration")
+        st.markdown("### ⚙️ Configuration")
+        st.markdown("---")
         
-        # Language selection
-        st.subheader("🌍 Languages")
+        st.markdown("#### 🌍 Source Language")
         source_lang = st.selectbox(
-            "Source Language",
+            "From",
             ["en", "hi", "es", "fr", "de", "it", "pt", "ja", "ko", "zh"],
             format_func=lambda x: {
-                "en": "English", "hi": "Hindi", "es": "Spanish", 
-                "fr": "French", "de": "German", "it": "Italian",
-                "pt": "Portuguese", "ja": "Japanese", 
-                "ko": "Korean", "zh": "Chinese"
-            }.get(x, x)
+                "en": "🇬🇧 English", "hi": "🇮🇳 Hindi", "es": "🇪🇸 Spanish", 
+                "fr": "🇫🇷 French", "de": "🇩🇪 German", "it": "🇮🇹 Italian",
+                "pt": "🇵🇹 Portuguese", "ja": "🇯🇵 Japanese", 
+                "ko": "🇰🇷 Korean", "zh": "🇨🇳 Chinese"
+            }.get(x, x),
+            label_visibility="collapsed"
         )
         
+        st.markdown("#### 🎯 Target Language")
         target_lang = st.selectbox(
-            "Target Language", 
+            "To",
             ["hi", "en", "es", "fr", "de", "it", "pt", "ja", "ko", "zh"],
             format_func=lambda x: {
-                "en": "English", "hi": "Hindi", "es": "Spanish", 
-                "fr": "French", "de": "German", "it": "Italian",
-                "pt": "Portuguese", "ja": "Japanese", 
-                "ko": "Korean", "zh": "Chinese"
-            }.get(x, x)
+                "en": "🇬🇧 English", "hi": "🇮🇳 Hindi", "es": "🇪🇸 Spanish", 
+                "fr": "🇫🇷 French", "de": "🇩🇪 German", "it": "🇮🇹 Italian",
+                "pt": "🇵🇹 Portuguese", "ja": "🇯🇵 Japanese", 
+                "ko": "🇰🇷 Korean", "zh": "🇨🇳 Chinese"
+            }.get(x, x),
+            label_visibility="collapsed"
         )
         
-        st.info("🚀 Powered by ElevenLabs AI Dubbing")
+        st.markdown("---")
+        st.markdown("### 🚀 Features")
+        st.markdown("""
+        - ✨ AI-powered voice cloning
+        - 🎭 Emotion preservation
+        - ⚡ Fast processing
+        - 🎬 Professional quality
+        - 🌐 32+ languages
+        """)
         
-    # Main content area
-    col1, col2 = st.columns([1, 1])
+        st.markdown("---")
+        st.markdown("### 💡 Powered By")
+        st.markdown("**ElevenLabs AI**")
+        st.caption("Industry-leading voice technology")
+        
+    col1, col2 = st.columns([1, 1], gap="large")
     
     input_video_path = None
     
     with col1:
-        st.header("Upload Video")
+        st.markdown("### 📤 Upload Your Video")
+        
         uploaded_file = st.file_uploader(
-            "Choose a video file",
+            "Drag and drop your video here",
             type=['mp4', 'avi', 'mov', 'mkv'],
-            help="Supported formats: MP4, AVI, MOV, MKV (max 10 minutes)"
+            help="📹 Supported formats: MP4, AVI, MOV, MKV | Max size: 100MB",
+            label_visibility="collapsed"
         )
         
         if uploaded_file is not None:
-            # Validate file
             if not validate_video_file(uploaded_file):
-                st.error("Invalid video file or file too large (max 100MB)")
+                st.error("❌ Invalid video file or file too large (max 100MB)")
                 return
                 
-            st.success(f"Uploaded: {uploaded_file.name}")
+            st.success(f"✅ {uploaded_file.name}")
             
-            # Save uploaded file
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp_file:
                 tmp_file.write(uploaded_file.read())
                 input_video_path = tmp_file.name
             
-            # Display original video
-            st.subheader("Original Video")
+            st.markdown("#### 🎥 Original Video")
             st.video(input_video_path)
             
-            # Get video info
             if video_processor:
                 video_info = video_processor.get_video_info(input_video_path)
                 if video_info:
-                    st.info(f"Duration: {format_time(video_info['duration'])} | Resolution: {video_info['width']}x{video_info['height']} | FPS: {video_info['fps']:.1f}")
+                    info_col1, info_col2, info_col3 = st.columns(3)
+                    with info_col1:
+                        st.markdown(f"<div class='stat-box'><b>⏱️ Duration</b><br>{format_time(video_info['duration'])}</div>", unsafe_allow_html=True)
+                    with info_col2:
+                        st.markdown(f"<div class='stat-box'><b>📐 Resolution</b><br>{video_info['width']}x{video_info['height']}</div>", unsafe_allow_html=True)
+                    with info_col3:
+                        st.markdown(f"<div class='stat-box'><b>🎞️ FPS</b><br>{video_info['fps']:.1f}</div>", unsafe_allow_html=True)
+        else:
+            st.info("👆 Upload a video file to get started")
     
     with col2:
-        st.header("Processing")
+        st.markdown("### 🎬 Processing Center")
         
-        if uploaded_file is not None and input_video_path is not None and st.button("🚀 Start Dubbing", type="primary"):
-            process_video_with_elevenlabs(
-                input_video_path, 
-                source_lang, 
-                target_lang,
-                video_processor,
-                dubbing_service
-            )
+        if uploaded_file is None:
+            st.markdown("""
+            <div class='feature-card'>
+                <h4>🎯 How it works</h4>
+                <ol>
+                    <li><b>Upload</b> your video file</li>
+                    <li><b>Select</b> source and target languages</li>
+                    <li><b>Click</b> Start Dubbing</li>
+                    <li><b>Download</b> your dubbed video</li>
+                </ol>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            st.markdown("""
+            <div class='feature-card'>
+                <h4>✨ AI Technology</h4>
+                <p>Our AI preserves the original speaker's emotion, tone, and timing while translating to your chosen language.</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        if uploaded_file is not None and input_video_path is not None:
+            st.markdown("#### 🚀 Ready to Process")
+            
+            lang_display = {
+                "en": "English", "hi": "Hindi", "es": "Spanish", 
+                "fr": "French", "de": "German", "it": "Italian",
+                "pt": "Portuguese", "ja": "Japanese", 
+                "ko": "Korean", "zh": "Chinese"
+            }
+            
+            st.info(f"📍 {lang_display[source_lang]} → {lang_display[target_lang]}")
+            
+            if st.button("🎙️ Start Dubbing", type="primary", use_container_width=True):
+                process_video_with_elevenlabs(
+                    input_video_path, 
+                    source_lang, 
+                    target_lang,
+                    video_processor,
+                    dubbing_service
+                )
 
 def process_video_with_elevenlabs(input_path, source_lang, target_lang, video_proc, dub_svc):
-    """Process video using ElevenLabs dubbing API"""
+    progress_container = st.container()
     
-    progress_bar = st.progress(0)
-    status_text = st.empty()
-    
+    with progress_container:
+        st.markdown("### 🔄 Processing Your Video")
+        progress_bar = st.progress(0)
+        status_text = st.empty()
+        
     try:
-        # Stage 1: Upload to ElevenLabs
-        status_text.text("📤 Uploading video to ElevenLabs...")
+        status_text.markdown("**📤 Uploading to ElevenLabs...**")
         progress_bar.progress(10)
+        time.sleep(0.5)
         
-        # Stage 2: Transcribing (shown to user, but happening on ElevenLabs)
-        status_text.text("🗣️ Transcribing speech...")
+        status_text.markdown("**🗣️ Transcribing speech...**")
         progress_bar.progress(25)
-        time.sleep(1)  # Brief pause for UI
+        time.sleep(0.5)
         
-        # Stage 3: Translating (shown to user, but happening on ElevenLabs)
-        status_text.text(f"🌐 Translating from {source_lang.upper()} to {target_lang.upper()}...")
+        status_text.markdown(f"**🌐 Translating {source_lang.upper()} → {target_lang.upper()}...**")
         progress_bar.progress(40)
         
-        # Stage 4: AI Dubbing (this is where the actual API call happens)
-        status_text.text("🎙️ Generating AI voice dubbing...")
+        status_text.markdown("**🎙️ Generating AI voice...**")
         progress_bar.progress(50)
         
         def progress_callback(message, percent):
-            status_text.text(message)
+            status_text.markdown(f"**{message}**")
             progress_bar.progress(percent)
         
-        # Call ElevenLabs dubbing API (this does everything on their servers)
         dubbed_video_path = dub_svc.dub_video_complete(
             input_path,
             source_lang,
@@ -162,49 +289,45 @@ def process_video_with_elevenlabs(input_path, source_lang, target_lang, video_pr
         
         if not dubbed_video_path:
             st.error("❌ Failed to dub video. Please check your ElevenLabs API key and quota.")
-            st.info("Visit https://elevenlabs.io/ to check your account status")
+            st.info("🔗 Visit https://elevenlabs.io/ to check your account status")
             return
         
-        # Complete
         progress_bar.progress(100)
-        status_text.text("✅ Dubbing completed successfully!")
+        status_text.markdown("**✅ Dubbing completed successfully!**")
+        time.sleep(1)
         
-        # Display results
-        st.success("🎉 Video dubbing completed!")
+        st.balloons()
+        st.success("🎉 Your video is ready!")
+        
+        st.markdown("---")
+        st.markdown("### 📺 Results")
         
         col1, col2 = st.columns(2)
         
         with col1:
-            st.subheader("Original Video")
+            st.markdown("#### 📹 Original")
             st.video(input_path)
         
         with col2:
-            st.subheader("Dubbed Video")
+            st.markdown("#### 🎬 Dubbed")
             st.video(dubbed_video_path)
         
-        # Download button
+        st.markdown("---")
+        
         with open(dubbed_video_path, 'rb') as f:
             st.download_button(
                 label="📥 Download Dubbed Video",
                 data=f.read(),
                 file_name=f"dubbed_{source_lang}_to_{target_lang}_{int(time.time())}.mp4",
                 mime="video/mp4",
-                type="primary"
+                type="primary",
+                use_container_width=True
             )
             
     except Exception as e:
-        st.error(f"Processing failed: {str(e)}")
+        st.error(f"❌ Processing failed: {str(e)}")
         progress_bar.progress(0)
-        status_text.text("❌ Processing failed")
-
-def cleanup_temp_files(file_paths):
-    """Clean up temporary files"""
-    for path in file_paths:
-        if path and os.path.exists(path):
-            try:
-                os.unlink(path)
-            except:
-                pass
+        status_text.markdown("**❌ Processing failed**")
 
 if __name__ == "__main__":
     main()
