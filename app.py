@@ -554,8 +554,7 @@ def main():
     
     st.markdown('<div class="content-section">', unsafe_allow_html=True)
     
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown('<div class="card-title">🎬 Video Dubbing - Main Feature</div>', unsafe_allow_html=True)
+    st.markdown('<h2 style="text-align: center; margin: 2rem 0 1.5rem 0;">🎬 Video Dubbing - Main Feature</h2>', unsafe_allow_html=True)
     
     col1, col2 = st.columns([1.2, 1], gap="large")
     
@@ -654,8 +653,6 @@ def main():
             """, unsafe_allow_html=True)
         
         st.markdown('</div>', unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
     
     st.markdown("---")
     st.markdown('<h2 style="text-align: center; margin: 2rem 0;">Additional Features</h2>', unsafe_allow_html=True)
