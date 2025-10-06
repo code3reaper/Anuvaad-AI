@@ -45,7 +45,7 @@ st.markdown("""
     }
     
     .block-container {
-        padding: 0 !important;
+        padding: 0 2rem !important;
         margin: 0 !important;
         max-width: 100% !important;
     }
@@ -57,7 +57,7 @@ st.markdown("""
     .header {
         background: rgba(15, 23, 42, 0.95);
         backdrop-filter: blur(10px);
-        padding: 1.5rem 3rem;
+        padding: 1.5rem 4rem;
         border-bottom: 1px solid rgba(148, 163, 184, 0.1);
         position: sticky;
         top: 0;
@@ -113,14 +113,22 @@ st.markdown("""
     }
     
     .content-section {
-        padding: 3rem 4rem;
+        padding: 3rem 2rem;
         max-width: 1400px;
         margin: 0 auto;
     }
     
     @media (max-width: 768px) {
         .content-section {
-            padding: 2rem 2rem;
+            padding: 2rem 1rem;
+        }
+        
+        .header {
+            padding: 1.5rem 2rem;
+        }
+        
+        .block-container {
+            padding: 0 1rem !important;
         }
     }
     
