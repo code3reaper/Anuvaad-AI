@@ -669,15 +669,28 @@ def main():
     st.markdown("---")
     st.markdown('<h2 style="text-align: center; margin: 2rem 0;">Additional Features</h2>', unsafe_allow_html=True)
     
-    feat_col1, feat_col2, feat_col3 = st.columns(3, gap="large")
+    btn_col1, btn_col2, btn_col3 = st.columns(3, gap="medium")
     
-    with feat_col1:
+    with btn_col1:
+        if st.button("🗣️ Text to Speech", key="tts_feature_btn", use_container_width=True):
+            st.session_state.active_feature = "tts"
+    
+    with btn_col2:
+        if st.button("🎤 Speech to Text", key="stt_feature_btn", use_container_width=True):
+            st.session_state.active_feature = "stt"
+    
+    with btn_col3:
+        if st.button("🌐 Text Translation", key="trans_feature_btn", use_container_width=True):
+            st.session_state.active_feature = "trans"
+    
+    if "active_feature" not in st.session_state:
+        st.session_state.active_feature = None
+    
+    if st.session_state.active_feature == "tts":
         render_text_to_speech(elevenlabs_client)
-    
-    with feat_col2:
+    elif st.session_state.active_feature == "stt":
         render_speech_to_text()
-    
-    with feat_col3:
+    elif st.session_state.active_feature == "trans":
         render_text_translation(gemini_client)
     
     st.markdown('</div>', unsafe_allow_html=True)
