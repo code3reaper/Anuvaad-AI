@@ -59,11 +59,23 @@ st.markdown("""
     }
     
     div[data-testid="stVerticalBlockBorderWrapper"] {
-        border: 4px solid rgba(96, 165, 250, 0.9) !important;
+        border: 6px solid #60a5fa !important;
         border-radius: 20px !important;
         padding: 2rem !important;
-        background: rgba(30, 41, 59, 0.8) !important;
-        box-shadow: 0 0 60px rgba(96, 165, 250, 0.5), 0 0 100px rgba(96, 165, 250, 0.3), 0 25px 70px rgba(0, 0, 0, 0.4) !important;
+        background: rgba(30, 41, 59, 0.9) !important;
+        box-shadow: 0 0 80px rgba(96, 165, 250, 0.8), 0 0 120px rgba(96, 165, 250, 0.5), inset 0 0 30px rgba(96, 165, 250, 0.1), 0 25px 70px rgba(0, 0, 0, 0.4) !important;
+        animation: borderGlow 3s ease-in-out infinite !important;
+    }
+    
+    @keyframes borderGlow {
+        0%, 100% {
+            border-color: #60a5fa;
+            box-shadow: 0 0 80px rgba(96, 165, 250, 0.8), 0 0 120px rgba(96, 165, 250, 0.5), inset 0 0 30px rgba(96, 165, 250, 0.1), 0 25px 70px rgba(0, 0, 0, 0.4);
+        }
+        50% {
+            border-color: #93c5fd;
+            box-shadow: 0 0 100px rgba(96, 165, 250, 1), 0 0 150px rgba(96, 165, 250, 0.7), inset 0 0 40px rgba(96, 165, 250, 0.2), 0 25px 70px rgba(0, 0, 0, 0.4);
+        }
     }
     
     .header {
