@@ -18,6 +18,11 @@ st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
     
+    html, body, [data-testid="stAppViewContainer"], .main {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
     * {
         font-family: 'Inter', sans-serif;
     }
@@ -27,12 +32,18 @@ st.markdown("""
     }
     
     .main {
-        padding: 0;
+        padding: 0 !important;
+        margin: 0 !important;
     }
     
     .block-container {
-        padding: 0;
-        max-width: 100%;
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+    }
+    
+    section[data-testid="stVerticalBlock"] > div {
+        padding: 0 !important;
     }
     
     .header {
@@ -44,6 +55,7 @@ st.markdown("""
         top: 0;
         z-index: 1000;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin: 0;
     }
     
     .logo {
@@ -60,6 +72,7 @@ st.markdown("""
         padding: 5rem 2rem 3rem 2rem;
         background: linear-gradient(135deg, rgba(96, 165, 250, 0.1) 0%, rgba(167, 139, 250, 0.1) 100%);
         border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        margin: 0;
     }
     
     .hero h1 {
@@ -92,8 +105,8 @@ st.markdown("""
     }
     
     .content-section {
-        padding: 3rem;
-        max-width: 1400px;
+        padding: 3rem 5rem;
+        max-width: 1600px;
         margin: 0 auto;
     }
     
@@ -198,15 +211,31 @@ st.markdown("""
     }
     
     .stSelectbox label {
-        font-weight: 600;
-        color: #f1f5f9;
-        font-size: 1rem;
+        font-weight: 700 !important;
+        color: #e0e7ff !important;
+        font-size: 1.1rem !important;
+        margin-bottom: 0.8rem !important;
     }
     
     .stSelectbox > div > div {
-        background: rgba(30, 41, 59, 0.6);
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        color: #f1f5f9;
+        background: rgba(30, 41, 59, 0.9) !important;
+        border: 2px solid rgba(96, 165, 250, 0.3) !important;
+        color: #f1f5f9 !important;
+    }
+    
+    .stSelectbox [data-baseweb="select"] {
+        background: rgba(30, 41, 59, 0.9) !important;
+    }
+    
+    .stSelectbox [data-baseweb="select"] > div {
+        background: rgba(30, 41, 59, 0.9) !important;
+        color: #f1f5f9 !important;
+        font-weight: 500 !important;
+        font-size: 1rem !important;
+    }
+    
+    .stSelectbox svg {
+        fill: #60a5fa !important;
     }
     
     .stProgress > div > div > div {
