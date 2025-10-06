@@ -58,17 +58,18 @@ st.markdown("""
         padding: 0 !important;
     }
     
-    div[data-testid="stVerticalBlockBorderWrapper"] {
-        border: 3px solid transparent !important;
-        border-radius: 20px !important;
-        padding: 2rem !important;
+    .main-feature-card {
+        border: 3px solid transparent;
+        border-radius: 24px;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
         background: 
             linear-gradient(rgba(30, 41, 59, 0.95), rgba(30, 41, 59, 0.95)) padding-box,
-            linear-gradient(135deg, #60a5fa, #a78bfa, #ec4899) border-box !important;
+            linear-gradient(135deg, #60a5fa, #a78bfa, #ec4899) border-box;
         box-shadow: 
-            0 0 40px rgba(96, 165, 250, 0.6),
-            0 0 80px rgba(167, 139, 250, 0.4),
-            0 10px 40px rgba(0, 0, 0, 0.5) !important;
+            0 0 50px rgba(96, 165, 250, 0.7),
+            0 0 100px rgba(167, 139, 250, 0.5),
+            0 15px 50px rgba(0, 0, 0, 0.6);
     }
     
     .header {
@@ -558,7 +559,8 @@ def main():
     
     st.markdown('<div class="content-section">', unsafe_allow_html=True)
     
-    with st.container(border=True):
+    st.markdown('<div class="main-feature-card">', unsafe_allow_html=True)
+    with st.container(border=False):
         st.markdown('<h2 style="text-align: center; margin: 0 0 1.5rem 0;">🎬 Video Dubbing - Main Feature</h2>', unsafe_allow_html=True)
         
         input_video_path = None
@@ -649,6 +651,7 @@ def main():
                     4. Click Start Dubbing
                 </div>
             """, unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
     
     st.markdown("---")
     st.markdown('<h2 style="text-align: center; margin: 2rem 0;">Additional Features</h2>', unsafe_allow_html=True)
