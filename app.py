@@ -338,8 +338,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 def render_text_to_speech(elevenlabs_client):
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown('<div class="card-title">🗣️ Text to Speech</div>', unsafe_allow_html=True)
+    st.markdown("### 🗣️ Text to Speech")
     
     text_input = st.text_area(
         "Enter text to convert to speech",
@@ -393,12 +392,9 @@ def render_text_to_speech(elevenlabs_client):
                     st.success("✅ Speech generated successfully!")
             except Exception as e:
                 st.error(f"❌ Failed to generate speech: {str(e)}")
-    
-    st.markdown('</div>', unsafe_allow_html=True)
 
 def render_speech_to_text():
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown('<div class="card-title">🎤 Speech to Text</div>', unsafe_allow_html=True)
+    st.markdown("### 🎤 Speech to Text")
     
     uploaded_audio = st.file_uploader(
         "Upload audio file",
@@ -449,12 +445,9 @@ def render_speech_to_text():
                 st.error("❌ Could not understand audio. Please try with clearer audio.")
             except Exception as e:
                 st.error(f"❌ Transcription failed: {str(e)}")
-    
-    st.markdown('</div>', unsafe_allow_html=True)
 
 def render_text_translation(gemini_client):
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown('<div class="card-title">🌐 Text Translation</div>', unsafe_allow_html=True)
+    st.markdown("### 🌐 Text Translation")
     
     source_text = st.text_area(
         "Enter text to translate",
@@ -501,8 +494,6 @@ def render_text_translation(gemini_client):
                     st.success(f"✅ Translated from {from_lang} to {to_lang}")
             except Exception as e:
                 st.error(f"❌ Translation failed: {str(e)}")
-    
-    st.markdown('</div>', unsafe_allow_html=True)
 
 @st.cache_resource
 def initialize_services():
@@ -556,76 +547,69 @@ def main():
     
     st.markdown('<h2 style="text-align: center; margin: 2rem 0 1.5rem 0;">🎬 Video Dubbing - Main Feature</h2>', unsafe_allow_html=True)
     
-    col1, col2 = st.columns([1.2, 1], gap="large")
-    
     input_video_path = None
     
-    with col1:
-        st.markdown('<div class="card" style="background: rgba(15, 23, 42, 0.6); padding: 1.5rem; border-radius: 15px; border: 1px solid rgba(96, 165, 250, 0.3);">', unsafe_allow_html=True)
-        st.markdown("#### 📤 Upload Video")
-        
-        uploaded_file = st.file_uploader(
-            "Choose your video file",
-            type=['mp4', 'avi', 'mov', 'mkv'],
-            help="Supported formats: MP4, AVI, MOV, MKV | Max size: 100MB",
-            label_visibility="collapsed"
-        )
-        
-        if uploaded_file is not None:
-            if not validate_video_file(uploaded_file):
-                st.error("❌ Invalid video file or file too large (max 100MB)")
-                st.markdown('</div>', unsafe_allow_html=True)
-                return
-                
-            st.markdown(f'<div class="success-box">✅ Uploaded: {uploaded_file.name}</div>', unsafe_allow_html=True)
+    st.markdown("#### 📤 Upload Video")
+    
+    uploaded_file = st.file_uploader(
+        "Choose your video file",
+        type=['mp4', 'avi', 'mov', 'mkv'],
+        help="Supported formats: MP4, AVI, MOV, MKV | Max size: 100MB"
+    )
+    
+    if uploaded_file is not None:
+        if not validate_video_file(uploaded_file):
+            st.error("❌ Invalid video file or file too large (max 100MB)")
+            return
             
-            with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp_file:
-                tmp_file.write(uploaded_file.read())
-                input_video_path = tmp_file.name
-            
+        st.success(f"✅ Uploaded: {uploaded_file.name}")
+        
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp_file:
+            tmp_file.write(uploaded_file.read())
+            input_video_path = tmp_file.name
+        
+        col1, col2 = st.columns([1, 1], gap="large")
+        
+        with col1:
             st.markdown("#### 🎥 Preview")
             st.video(input_video_path)
         
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    with col2:
-        st.markdown('<div class="card" style="background: rgba(15, 23, 42, 0.6); padding: 1.5rem; border-radius: 15px; border: 1px solid rgba(96, 165, 250, 0.3);">', unsafe_allow_html=True)
-        st.markdown("#### ⚙️ Configuration")
-        
-        st.markdown("##### 🌍 Source Language")
-        source_lang = st.selectbox(
-            "From",
-            ["en", "hi", "es", "fr", "de", "it", "pt", "ja", "ko", "zh"],
-            format_func=lambda x: {
-                "en": "🇬🇧 English", "hi": "🇮🇳 Hindi", "es": "🇪🇸 Spanish", 
-                "fr": "🇫🇷 French", "de": "🇩🇪 German", "it": "🇮🇹 Italian",
-                "pt": "🇵🇹 Portuguese", "ja": "🇯🇵 Japanese", 
-                "ko": "🇰🇷 Korean", "zh": "🇨🇳 Chinese"
-            }.get(x, x),
-            label_visibility="collapsed"
-        )
-        
-        st.markdown("##### 🎯 Target Language")
-        target_lang = st.selectbox(
-            "To",
-            ["hi", "en", "es", "fr", "de", "it", "pt", "ja", "ko", "zh"],
-            format_func=lambda x: {
-                "en": "🇬🇧 English", "hi": "🇮🇳 Hindi", "es": "🇪🇸 Spanish", 
-                "fr": "🇫🇷 French", "de": "🇩🇪 German", "it": "🇮🇹 Italian",
-                "pt": "🇵🇹 Portuguese", "ja": "🇯🇵 Japanese", 
-                "ko": "🇰🇷 Korean", "zh": "🇨🇳 Chinese"
-            }.get(x, x),
-            label_visibility="collapsed"
-        )
-        
-        lang_display = {
-            "en": "English", "hi": "Hindi", "es": "Spanish", 
-            "fr": "French", "de": "German", "it": "Italian",
-            "pt": "Portuguese", "ja": "Japanese", 
-            "ko": "Korean", "zh": "Chinese"
-        }
-        
-        if uploaded_file is not None and input_video_path is not None:
+        with col2:
+            st.markdown("#### ⚙️ Configuration")
+            
+            st.markdown("##### 🌍 Source Language")
+            source_lang = st.selectbox(
+                "From",
+                ["en", "hi", "es", "fr", "de", "it", "pt", "ja", "ko", "zh"],
+                format_func=lambda x: {
+                    "en": "🇬🇧 English", "hi": "🇮🇳 Hindi", "es": "🇪🇸 Spanish", 
+                    "fr": "🇫🇷 French", "de": "🇩🇪 German", "it": "🇮🇹 Italian",
+                    "pt": "🇵🇹 Portuguese", "ja": "🇯🇵 Japanese", 
+                    "ko": "🇰🇷 Korean", "zh": "🇨🇳 Chinese"
+                }.get(x, x),
+                label_visibility="collapsed"
+            )
+            
+            st.markdown("##### 🎯 Target Language")
+            target_lang = st.selectbox(
+                "To",
+                ["hi", "en", "es", "fr", "de", "it", "pt", "ja", "ko", "zh"],
+                format_func=lambda x: {
+                    "en": "🇬🇧 English", "hi": "🇮🇳 Hindi", "es": "🇪🇸 Spanish", 
+                    "fr": "🇫🇷 French", "de": "🇩🇪 German", "it": "🇮🇹 Italian",
+                    "pt": "🇵🇹 Portuguese", "ja": "🇯🇵 Japanese", 
+                    "ko": "🇰🇷 Korean", "zh": "🇨🇳 Chinese"
+                }.get(x, x),
+                label_visibility="collapsed"
+            )
+            
+            lang_display = {
+                "en": "English", "hi": "Hindi", "es": "Spanish", 
+                "fr": "French", "de": "German", "it": "Italian",
+                "pt": "Portuguese", "ja": "Japanese", 
+                "ko": "Korean", "zh": "Chinese"
+            }
+            
             st.markdown(f"""
                 <div class="info-box">
                     <strong>Translation Path:</strong><br>
@@ -641,18 +625,16 @@ def main():
                     video_processor,
                     dubbing_service
                 )
-        else:
-            st.markdown("""
-                <div class="info-box">
-                    <strong>📋 Instructions:</strong><br>
-                    1. Upload your video file<br>
-                    2. Select source language<br>
-                    3. Choose target language<br>
-                    4. Click Start Dubbing
-                </div>
-            """, unsafe_allow_html=True)
-        
-        st.markdown('</div>', unsafe_allow_html=True)
+    else:
+        st.markdown("""
+            <div class="info-box">
+                <strong>📋 Instructions:</strong><br>
+                1. Upload your video file<br>
+                2. Select source language<br>
+                3. Choose target language<br>
+                4. Click Start Dubbing
+            </div>
+        """, unsafe_allow_html=True)
     
     st.markdown("---")
     st.markdown('<h2 style="text-align: center; margin: 2rem 0;">Additional Features</h2>', unsafe_allow_html=True)
