@@ -22,6 +22,26 @@ st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
     
+    :root {
+        --accent-1: #60a5fa;
+        --accent-2: #a78bfa;
+        --accent-3: #ec4899;
+        --bg-primary: #0f172a;
+        --bg-secondary: #1e293b;
+        --bg-tertiary: #334155;
+        --text-primary: #f1f5f9;
+        --text-secondary: #cbd5e1;
+        --text-muted: #94a3b8;
+        --spacing-xs: 0.5rem;
+        --spacing-sm: 1rem;
+        --spacing-md: 1.5rem;
+        --spacing-lg: 2rem;
+        --spacing-xl: 3rem;
+        --radius-sm: 12px;
+        --radius-md: 20px;
+        --radius-lg: 24px;
+    }
+    
     [data-testid="stHeader"] {
         display: none !important;
     }
@@ -40,7 +60,34 @@ st.markdown("""
     }
     
     .stApp {
-        background: #0f172a;
+        background: var(--bg-primary);
+        position: relative;
+    }
+    
+    .stApp::before {
+        content: '';
+        position: fixed;
+        top: -20%;
+        right: -10%;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(96, 165, 250, 0.15) 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 0;
+    }
+    
+    .stApp::after {
+        content: '';
+        position: fixed;
+        bottom: -20%;
+        left: -10%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(167, 139, 250, 0.12) 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 0;
     }
     
     .main {
@@ -60,8 +107,8 @@ st.markdown("""
     
     div[data-testid="stVerticalBlockBorderWrapper"] {
         border: 5px solid !important;
-        border-image: linear-gradient(135deg, #60a5fa, #a78bfa, #ec4899) 1 !important;
-        border-radius: 24px !important;
+        border-image: linear-gradient(135deg, var(--accent-1), var(--accent-2), var(--accent-3)) 1 !important;
+        border-radius: var(--radius-lg) !important;
         padding: 2.5rem !important;
         background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95)) !important;
         box-shadow: 
@@ -72,15 +119,16 @@ st.markdown("""
         position: relative !important;
         outline: 5px solid transparent !important;
         outline-offset: -5px !important;
+        transition: all 0.3s ease !important;
     }
     
     div[data-testid="stVerticalBlockBorderWrapper"]::before {
         content: '' !important;
         position: absolute !important;
         inset: -5px !important;
-        border-radius: 24px !important;
+        border-radius: var(--radius-lg) !important;
         padding: 5px !important;
-        background: linear-gradient(135deg, #60a5fa, #a78bfa, #ec4899) !important;
+        background: linear-gradient(135deg, var(--accent-1), var(--accent-2), var(--accent-3)) !important;
         -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0) !important;
         -webkit-mask-composite: xor !important;
         mask-composite: exclude !important;
@@ -111,27 +159,32 @@ st.markdown("""
     .hero {
         text-align: center;
         padding: 5rem 2rem 3rem 2rem;
-        background: rgba(96, 165, 250, 0.05);
-        border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        background: linear-gradient(180deg, rgba(96, 165, 250, 0.08) 0%, transparent 100%);
+        border-bottom: 1px solid rgba(96, 165, 250, 0.15);
         margin: 0;
+        position: relative;
+        z-index: 1;
     }
     
     .hero h1 {
-        font-size: 4rem;
+        font-size: 3.5rem;
         font-weight: 800;
-        background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #ec4899 100%);
+        background: linear-gradient(135deg, var(--accent-1) 0%, var(--accent-2) 50%, var(--accent-3) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 1rem;
         line-height: 1.2;
+        letter-spacing: -0.02em;
+        text-shadow: 0 0 60px rgba(96, 165, 250, 0.3);
     }
     
     .hero p {
-        font-size: 1.5rem;
-        color: #cbd5e1;
+        font-size: 1.35rem;
+        color: var(--text-secondary);
         font-weight: 300;
         max-width: 800px;
         margin: 0 auto 2rem auto;
+        line-height: 1.7;
     }
     
     .badge {
@@ -168,11 +221,18 @@ st.markdown("""
     .card {
         background: rgba(30, 41, 59, 0.8);
         backdrop-filter: blur(10px);
-        border-radius: 20px;
-        padding: 2.5rem;
-        border: 1px solid rgba(148, 163, 184, 0.1);
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        margin-bottom: 2rem;
+        border-radius: var(--radius-md);
+        padding: var(--spacing-lg);
+        border: 1px solid rgba(96, 165, 250, 0.15);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(148, 163, 184, 0.1);
+        margin-bottom: var(--spacing-lg);
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.4), 0 0 40px rgba(96, 165, 250, 0.2), inset 0 1px 0 rgba(148, 163, 184, 0.15);
+        border-color: rgba(96, 165, 250, 0.3);
     }
     
     .card-title {
@@ -249,20 +309,35 @@ st.markdown("""
     
     .stButton>button {
         width: 100%;
-        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        background: linear-gradient(135deg, var(--accent-1) 0%, var(--accent-2) 100%);
+        background-size: 200% 100%;
+        background-position: 0% 50%;
         color: white;
         border: none;
-        padding: 1rem 2rem;
-        font-size: 1.1rem;
+        padding: 0.85rem 1.75rem;
+        font-size: 1.05rem;
         font-weight: 600;
-        border-radius: 12px;
-        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
-        transition: all 0.3s ease;
+        border-radius: var(--radius-sm);
+        box-shadow: 0 8px 25px rgba(96, 165, 250, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
     }
     
     .stButton>button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 12px 35px rgba(59, 130, 246, 0.6);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 35px rgba(96, 165, 250, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        background-position: 100% 50%;
+    }
+    
+    .stButton>button:active {
+        transform: translateY(0px);
+        box-shadow: 0 4px 15px rgba(96, 165, 250, 0.4);
+    }
+    
+    .stButton>button:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.4), 0 12px 35px rgba(96, 165, 250, 0.6);
     }
     
     .stSelectbox label {
@@ -301,7 +376,18 @@ st.markdown("""
     }
     
     .stProgress > div > div > div {
-        background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+        background: linear-gradient(90deg, var(--accent-1) 0%, var(--accent-2) 50%, var(--accent-3) 100%);
+        background-size: 200% 100%;
+        animation: progressShimmer 2s linear infinite;
+    }
+    
+    @keyframes progressShimmer {
+        0% {
+            background-position: -200% 0;
+        }
+        100% {
+            background-position: 200% 0;
+        }
     }
     
     .upload-zone {
@@ -319,21 +405,27 @@ st.markdown("""
     }
     
     .info-box {
-        background: rgba(59, 130, 246, 0.1);
-        border-left: 4px solid #3b82f6;
-        padding: 1rem 1.5rem;
-        border-radius: 8px;
-        color: #cbd5e1;
-        margin: 1rem 0;
+        background: linear-gradient(135deg, rgba(96, 165, 250, 0.12), rgba(59, 130, 246, 0.08));
+        border-left: 4px solid var(--accent-1);
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-radius: var(--radius-sm);
+        color: var(--text-secondary);
+        margin: var(--spacing-sm) 0;
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(96, 165, 250, 0.2);
+        border-left-width: 4px;
     }
     
     .success-box {
-        background: rgba(34, 197, 94, 0.1);
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.12), rgba(16, 185, 129, 0.08));
         border-left: 4px solid #22c55e;
-        padding: 1rem 1.5rem;
-        border-radius: 8px;
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-radius: var(--radius-sm);
         color: #86efac;
-        margin: 1rem 0;
+        margin: var(--spacing-sm) 0;
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(34, 197, 94, 0.2);
+        border-left-width: 4px;
     }
     
     .footer {
@@ -345,17 +437,32 @@ st.markdown("""
     }
     
     h1, h2, h3, h4, h5, h6 {
-        color: #f1f5f9 !important;
+        color: var(--text-primary) !important;
+        letter-spacing: -0.01em;
+    }
+    
+    h2 {
+        font-size: 2.2rem !important;
+        font-weight: 700 !important;
+    }
+    
+    h3 {
+        font-size: 1.6rem !important;
+        font-weight: 600 !important;
     }
     
     h5 {
         color: #e0e7ff !important;
         font-weight: 700 !important;
         margin-bottom: 0.8rem !important;
+        text-transform: uppercase;
+        font-size: 0.85rem !important;
+        letter-spacing: 0.05em !important;
     }
     
     p {
-        color: #cbd5e1;
+        color: var(--text-secondary);
+        line-height: 1.7;
     }
     
     .stVideo {
