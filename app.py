@@ -408,8 +408,11 @@ def render_speech_to_text():
     
     if uploaded_audio:
         st.audio(uploaded_audio)
-        
-        if st.button("📝 Transcribe", key="stt_btn", use_container_width=True):
+    else:
+        st.markdown('<div style="height: 60px;"></div>', unsafe_allow_html=True)
+    
+    if st.button("📝 Transcribe", key="stt_btn", use_container_width=True, disabled=uploaded_audio is None):
+        if uploaded_audio:
             try:
                 with st.spinner("Transcribing audio..."):
                     file_extension = uploaded_audio.name.split('.')[-1].lower()
@@ -446,8 +449,6 @@ def render_speech_to_text():
                 st.error("❌ Could not understand audio. Please try with clearer audio.")
             except Exception as e:
                 st.error(f"❌ Transcription failed: {str(e)}")
-    else:
-        st.info("Upload an audio file to start transcription")
     
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -561,6 +562,7 @@ def main():
     input_video_path = None
     
     with col1:
+        st.markdown('<div class="card" style="background: rgba(15, 23, 42, 0.6); padding: 1.5rem; border-radius: 15px; border: 1px solid rgba(96, 165, 250, 0.3);">', unsafe_allow_html=True)
         st.markdown("#### 📤 Upload Video")
         
         uploaded_file = st.file_uploader(
@@ -584,8 +586,11 @@ def main():
             
             st.markdown("#### 🎥 Preview")
             st.video(input_video_path)
+        
+        st.markdown('</div>', unsafe_allow_html=True)
     
     with col2:
+        st.markdown('<div class="card" style="background: rgba(15, 23, 42, 0.6); padding: 1.5rem; border-radius: 15px; border: 1px solid rgba(96, 165, 250, 0.3);">', unsafe_allow_html=True)
         st.markdown("#### ⚙️ Configuration")
         
         st.markdown("##### 🌍 Source Language")
@@ -647,6 +652,8 @@ def main():
                     4. Click Start Dubbing
                 </div>
             """, unsafe_allow_html=True)
+        
+        st.markdown('</div>', unsafe_allow_html=True)
     
     st.markdown('</div>', unsafe_allow_html=True)
     
