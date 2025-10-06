@@ -9,6 +9,7 @@ from utils import format_time, validate_video_file
 import speech_recognition as sr
 from elevenlabs import ElevenLabs
 from google import genai
+from pydub import AudioSegment
 
 st.set_page_config(
     page_title="Anuvaad AI - Professional Video Dubbing",
@@ -411,17 +412,31 @@ def render_speech_to_text():
         if st.button("📝 Transcribe", key="stt_btn", use_container_width=True):
             try:
                 with st.spinner("Transcribing audio..."):
-                    with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as tmp_file:
-                        tmp_file.write(uploaded_audio.read())
-                        audio_path = tmp_file.name
+                    file_extension = uploaded_audio.name.split('.')[-1].lower()
+                    
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=f'.{file_extension}') as tmp_input:
+                        tmp_input.write(uploaded_audio.read())
+                        input_path = tmp_input.name
+                    
+                    wav_path = tempfile.mktemp(suffix='.wav')
+                    
+                    try:
+                        audio = AudioSegment.from_file(input_path, format=file_extension)
+                        audio.export(wav_path, format='wav')
+                    except Exception as e:
+                        os.unlink(input_path)
+                        raise Exception(f"Failed to convert audio: {str(e)}")
                     
                     recognizer = sr.Recognizer()
                     
-                    with sr.AudioFile(audio_path) as source:
-                        audio_data = recognizer.record(source)
-                        text = recognizer.recognize_google(audio_data)
-                    
-                    os.unlink(audio_path)
+                    try:
+                        with sr.AudioFile(wav_path) as source:
+                            audio_data = recognizer.record(source)
+                            text = recognizer.recognize_google(audio_data)
+                    finally:
+                        os.unlink(input_path)
+                        if os.path.exists(wav_path):
+                            os.unlink(wav_path)
                     
                     st.markdown("##### 📄 Transcription:")
                     st.text_area("Result", value=text, height=150, key="stt_result")
