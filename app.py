@@ -59,18 +59,32 @@ st.markdown("""
     }
     
     div[data-testid="stVerticalBlockBorderWrapper"] {
-        border: 4px solid transparent !important;
+        border: 5px solid !important;
+        border-image: linear-gradient(135deg, #60a5fa, #a78bfa, #ec4899) 1 !important;
         border-radius: 24px !important;
         padding: 2.5rem !important;
-        background: 
-            linear-gradient(135deg, rgba(30, 41, 59, 0.98), rgba(51, 65, 85, 0.98)) padding-box,
-            linear-gradient(135deg, #60a5fa, #a78bfa, #ec4899) border-box !important;
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95)) !important;
         box-shadow: 
-            0 0 60px rgba(96, 165, 250, 0.8),
-            0 0 120px rgba(167, 139, 250, 0.6),
-            0 20px 60px rgba(0, 0, 0, 0.7),
-            inset 0 1px 0 rgba(96, 165, 250, 0.2) !important;
+            0 0 80px rgba(96, 165, 250, 0.9),
+            0 0 150px rgba(167, 139, 250, 0.7),
+            0 25px 80px rgba(0, 0, 0, 0.8),
+            inset 0 0 60px rgba(96, 165, 250, 0.15) !important;
         position: relative !important;
+        outline: 5px solid transparent !important;
+        outline-offset: -5px !important;
+    }
+    
+    div[data-testid="stVerticalBlockBorderWrapper"]::before {
+        content: '' !important;
+        position: absolute !important;
+        inset: -5px !important;
+        border-radius: 24px !important;
+        padding: 5px !important;
+        background: linear-gradient(135deg, #60a5fa, #a78bfa, #ec4899) !important;
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0) !important;
+        -webkit-mask-composite: xor !important;
+        mask-composite: exclude !important;
+        pointer-events: none !important;
     }
     
     .header {
