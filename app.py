@@ -6,6 +6,9 @@ import time
 from video_processor import VideoProcessor
 from elevenlabs_dubbing import ElevenLabsDubbing
 from utils import format_time, validate_video_file
+import speech_recognition as sr
+from elevenlabs import ElevenLabs
+from google import genai
 
 st.set_page_config(
     page_title="Anuvaad AI - Professional Video Dubbing",
@@ -333,22 +336,181 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+def render_text_to_speech(elevenlabs_client):
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown('<div class="card-title">🗣️ Text to Speech</div>', unsafe_allow_html=True)
+    
+    text_input = st.text_area(
+        "Enter text to convert to speech",
+        placeholder="Type or paste your text here...",
+        height=150,
+        key="tts_input"
+    )
+    
+    voice_id = st.selectbox(
+        "Select Voice",
+        ["Rachel", "Adam", "Antoni", "Arnold", "Bella", "Domi", "Elli", "Josh", "Sam"],
+        key="tts_voice"
+    )
+    
+    voice_map = {
+        "Rachel": "21m00Tcm4TlvDq8ikWAM",
+        "Adam": "pNInz6obpgDQGcFmaJgB",
+        "Antoni": "ErXwobaYiN019PkySvjV",
+        "Arnold": "VR6AewLTigWG4xSOukaG",
+        "Bella": "EXAVITQu4vr4xnSDxMaL",
+        "Domi": "AZnzlk1XvdvUeBnXmlld",
+        "Elli": "MF3mGyEYCl7XYWbV9V6O",
+        "Josh": "TxGEqnHWrfWFTfGW9XjX",
+        "Sam": "yoZ06aMxZJJ28mfd3POQ"
+    }
+    
+    if st.button("🎵 Generate Speech", key="tts_btn", use_container_width=True):
+        if not text_input.strip():
+            st.error("Please enter some text first")
+        else:
+            try:
+                with st.spinner("Generating speech..."):
+                    audio = elevenlabs_client.generate(
+                        text=text_input,
+                        voice=voice_map[voice_id],
+                        model="eleven_multilingual_v2"
+                    )
+                    
+                    audio_bytes = b''.join(audio)
+                    
+                    st.audio(audio_bytes, format='audio/mpeg')
+                    
+                    st.download_button(
+                        label="📥 Download Audio",
+                        data=audio_bytes,
+                        file_name=f"tts_{int(time.time())}.mp3",
+                        mime="audio/mpeg",
+                        key="tts_download"
+                    )
+                    
+                    st.success("✅ Speech generated successfully!")
+            except Exception as e:
+                st.error(f"❌ Failed to generate speech: {str(e)}")
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+
+def render_speech_to_text():
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown('<div class="card-title">🎤 Speech to Text</div>', unsafe_allow_html=True)
+    
+    uploaded_audio = st.file_uploader(
+        "Upload audio file",
+        type=['wav', 'mp3', 'ogg', 'flac', 'm4a'],
+        key="stt_upload"
+    )
+    
+    if uploaded_audio:
+        st.audio(uploaded_audio)
+        
+        if st.button("📝 Transcribe", key="stt_btn", use_container_width=True):
+            try:
+                with st.spinner("Transcribing audio..."):
+                    with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as tmp_file:
+                        tmp_file.write(uploaded_audio.read())
+                        audio_path = tmp_file.name
+                    
+                    recognizer = sr.Recognizer()
+                    
+                    with sr.AudioFile(audio_path) as source:
+                        audio_data = recognizer.record(source)
+                        text = recognizer.recognize_google(audio_data)
+                    
+                    os.unlink(audio_path)
+                    
+                    st.markdown("##### 📄 Transcription:")
+                    st.text_area("Result", value=text, height=150, key="stt_result")
+                    
+                    st.success("✅ Transcription completed!")
+            except sr.UnknownValueError:
+                st.error("❌ Could not understand audio. Please try with clearer audio.")
+            except Exception as e:
+                st.error(f"❌ Transcription failed: {str(e)}")
+    else:
+        st.info("Upload an audio file to start transcription")
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+
+def render_text_translation(gemini_client):
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown('<div class="card-title">🌐 Text Translation</div>', unsafe_allow_html=True)
+    
+    source_text = st.text_area(
+        "Enter text to translate",
+        placeholder="Type or paste text here...",
+        height=120,
+        key="trans_input"
+    )
+    
+    trans_col1, trans_col2 = st.columns(2)
+    
+    with trans_col1:
+        from_lang = st.selectbox(
+            "From",
+            ["English", "Hindi", "Spanish", "French", "German", "Italian", "Portuguese", "Japanese", "Korean", "Chinese"],
+            key="trans_from"
+        )
+    
+    with trans_col2:
+        to_lang = st.selectbox(
+            "To",
+            ["Hindi", "English", "Spanish", "French", "German", "Italian", "Portuguese", "Japanese", "Korean", "Chinese"],
+            key="trans_to"
+        )
+    
+    if st.button("🔄 Translate", key="trans_btn", use_container_width=True):
+        if not source_text.strip():
+            st.error("Please enter some text to translate")
+        elif from_lang == to_lang:
+            st.error("Source and target languages must be different")
+        else:
+            try:
+                with st.spinner("Translating..."):
+                    prompt = f"Translate the following text from {from_lang} to {to_lang}. Only provide the translation, no explanations:\n\n{source_text}"
+                    
+                    response = gemini_client.models.generate_content(
+                        model="gemini-2.0-flash-exp",
+                        contents=prompt
+                    )
+                    translated_text = response.text
+                    
+                    st.markdown("##### 📝 Translation:")
+                    st.text_area("Result", value=translated_text, height=120, key="trans_result")
+                    
+                    st.success(f"✅ Translated from {from_lang} to {to_lang}")
+            except Exception as e:
+                st.error(f"❌ Translation failed: {str(e)}")
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+
 @st.cache_resource
 def initialize_services():
     try:
         elevenlabs_api_key = os.environ.get('ELEVENLABS_API_KEY')
+        gemini_api_key = os.environ.get('GEMINI_API_KEY')
         
         if not elevenlabs_api_key:
             st.error("🔑 ELEVENLABS_API_KEY environment variable not set")
-            return None, None
+            return None, None, None, None
+        
+        if not gemini_api_key:
+            st.error("🔑 GEMINI_API_KEY environment variable not set")
+            return None, None, None, None
         
         video_processor = VideoProcessor()
         dubbing_service = ElevenLabsDubbing(api_key=elevenlabs_api_key)
+        elevenlabs_client = ElevenLabs(api_key=elevenlabs_api_key)
+        gemini_client = genai.Client(api_key=gemini_api_key)
         
-        return video_processor, dubbing_service
+        return video_processor, dubbing_service, elevenlabs_client, gemini_client
     except Exception as e:
         st.error(f"❌ Failed to initialize services: {str(e)}")
-        return None, None
+        return None, None, None, None
 
 def main():
     st.markdown("""
@@ -359,9 +521,9 @@ def main():
     
     st.markdown("""
         <div class="hero">
-            <h1>Transform Videos<br>Across Languages</h1>
-            <p>AI-powered video dubbing that preserves emotion, tone, and timing</p>
-            <span class="badge">✨ Powered by ElevenLabs AI</span>
+            <h1>Transform Content<br>Across Languages</h1>
+            <p>AI-powered video dubbing, text-to-speech, speech-to-text, and translation</p>
+            <span class="badge">✨ Powered by ElevenLabs & Google Gemini</span>
         </div>
     """, unsafe_allow_html=True)
     
@@ -372,42 +534,19 @@ def main():
         st.markdown('</div>', unsafe_allow_html=True)
         return
     
-    video_processor, dubbing_service = services
+    video_processor, dubbing_service, elevenlabs_client, gemini_client = services
     
     st.markdown('<div class="content-section">', unsafe_allow_html=True)
     
-    st.markdown("""
-        <div class="feature-grid">
-            <div class="feature-box">
-                <div class="feature-icon">🎭</div>
-                <div class="feature-title">Emotion Preservation</div>
-                <div class="feature-desc">Maintains original speaker's tone and feeling</div>
-            </div>
-            <div class="feature-box">
-                <div class="feature-icon">⚡</div>
-                <div class="feature-title">Lightning Fast</div>
-                <div class="feature-desc">Process videos in minutes, not hours</div>
-            </div>
-            <div class="feature-box">
-                <div class="feature-icon">🌍</div>
-                <div class="feature-title">32+ Languages</div>
-                <div class="feature-desc">Reach global audiences effortlessly</div>
-            </div>
-            <div class="feature-box">
-                <div class="feature-icon">🎬</div>
-                <div class="feature-title">Professional Quality</div>
-                <div class="feature-desc">Studio-grade AI voice generation</div>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown('<div class="card-title">🎬 Video Dubbing - Main Feature</div>', unsafe_allow_html=True)
     
     col1, col2 = st.columns([1.2, 1], gap="large")
     
     input_video_path = None
     
     with col1:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown('<div class="card-title">📤 Upload Video</div>', unsafe_allow_html=True)
+        st.markdown("#### 📤 Upload Video")
         
         uploaded_file = st.file_uploader(
             "Choose your video file",
@@ -430,50 +569,9 @@ def main():
             
             st.markdown("#### 🎥 Preview")
             st.video(input_video_path)
-            
-            if video_processor:
-                video_info = video_processor.get_video_info(input_video_path)
-                if video_info:
-                    info_col1, info_col2, info_col3 = st.columns(3)
-                    with info_col1:
-                        st.markdown(f"""
-                            <div class='stat-box'>
-                                <span class='stat-number'>⏱️</span>
-                                <span class='stat-label'>{format_time(video_info['duration'])}</span>
-                            </div>
-                        """, unsafe_allow_html=True)
-                    with info_col2:
-                        st.markdown(f"""
-                            <div class='stat-box'>
-                                <span class='stat-number'>📐</span>
-                                <span class='stat-label'>{video_info['width']}x{video_info['height']}</span>
-                            </div>
-                        """, unsafe_allow_html=True)
-                    with info_col3:
-                        st.markdown(f"""
-                            <div class='stat-box'>
-                                <span class='stat-number'>🎞️</span>
-                                <span class='stat-label'>{video_info['fps']:.1f} FPS</span>
-                            </div>
-                        """, unsafe_allow_html=True)
-        else:
-            st.markdown("""
-                <div class="upload-zone">
-                    <div style="font-size: 3rem; margin-bottom: 1rem;">📹</div>
-                    <div style="font-size: 1.2rem; font-weight: 600; color: #cbd5e1; margin-bottom: 0.5rem;">
-                        Drag and drop your video here
-                    </div>
-                    <div style="color: #94a3b8;">
-                        or click to browse files
-                    </div>
-                </div>
-            """, unsafe_allow_html=True)
-        
-        st.markdown('</div>', unsafe_allow_html=True)
     
     with col2:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown('<div class="card-title">⚙️ Configuration</div>', unsafe_allow_html=True)
+        st.markdown("#### ⚙️ Configuration")
         
         st.markdown("##### 🌍 Source Language")
         source_lang = st.selectbox(
@@ -534,8 +632,22 @@ def main():
                     4. Click Start Dubbing
                 </div>
             """, unsafe_allow_html=True)
-        
-        st.markdown('</div>', unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    st.markdown("---")
+    st.markdown('<h2 style="text-align: center; margin: 2rem 0;">Additional Features</h2>', unsafe_allow_html=True)
+    
+    feat_col1, feat_col2, feat_col3 = st.columns(3, gap="large")
+    
+    with feat_col1:
+        render_text_to_speech(elevenlabs_client)
+    
+    with feat_col2:
+        render_speech_to_text()
+    
+    with feat_col3:
+        render_text_translation(gemini_client)
     
     st.markdown('</div>', unsafe_allow_html=True)
     
