@@ -18,6 +18,14 @@ st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
     
+    [data-testid="stHeader"] {
+        display: none !important;
+    }
+    
+    [data-testid="stToolbar"] {
+        display: none !important;
+    }
+    
     html, body, [data-testid="stAppViewContainer"], .main {
         margin: 0 !important;
         padding: 0 !important;
@@ -105,9 +113,15 @@ st.markdown("""
     }
     
     .content-section {
-        padding: 3rem 5rem;
-        max-width: 1600px;
+        padding: 3rem 4rem;
+        max-width: 1400px;
         margin: 0 auto;
+    }
+    
+    @media (max-width: 768px) {
+        .content-section {
+            padding: 2rem 2rem;
+        }
     }
     
     .card {
@@ -212,30 +226,37 @@ st.markdown("""
     
     .stSelectbox label {
         font-weight: 700 !important;
-        color: #e0e7ff !important;
+        color: #ffffff !important;
         font-size: 1.1rem !important;
         margin-bottom: 0.8rem !important;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
     
     .stSelectbox > div > div {
-        background: rgba(30, 41, 59, 0.9) !important;
-        border: 2px solid rgba(96, 165, 250, 0.3) !important;
-        color: #f1f5f9 !important;
+        background: rgba(30, 41, 59, 0.95) !important;
+        border: 2px solid rgba(96, 165, 250, 0.5) !important;
+        color: #ffffff !important;
     }
     
     .stSelectbox [data-baseweb="select"] {
-        background: rgba(30, 41, 59, 0.9) !important;
+        background: rgba(30, 41, 59, 0.95) !important;
     }
     
     .stSelectbox [data-baseweb="select"] > div {
-        background: rgba(30, 41, 59, 0.9) !important;
-        color: #f1f5f9 !important;
-        font-weight: 500 !important;
-        font-size: 1rem !important;
+        background: rgba(30, 41, 59, 0.95) !important;
+        color: #ffffff !important;
+        font-weight: 600 !important;
+        font-size: 1.05rem !important;
     }
     
     .stSelectbox svg {
         fill: #60a5fa !important;
+        width: 24px !important;
+        height: 24px !important;
+    }
+    
+    .stSelectbox [aria-expanded="true"] svg {
+        fill: #a78bfa !important;
     }
     
     .stProgress > div > div > div {
