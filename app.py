@@ -651,8 +651,10 @@ def render_word_to_story(story_generator):
                                 mime="audio/mpeg",
                                 key="story_audio_download"
                             )
-                        
-                        st.success("✅ Story created successfully!")
+                            st.success("✅ Story created successfully with audio narration!")
+                        else:
+                            st.warning("⚠️ Story created, but audio generation failed. This is likely due to insufficient ElevenLabs credits. Please check your ElevenLabs account quota.")
+                            st.info("💡 You can still read the story above. To get audio narration, please add credits to your ElevenLabs account at https://elevenlabs.io/")
                     else:
                         st.error("❌ Failed to generate story. Please try again.")
                         
