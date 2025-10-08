@@ -4,12 +4,11 @@
 
 Anuvaad AI is a professional video dubbing application that translates and dubs videos from one language to another while maintaining synchronization and audio quality. The application uses ElevenLabs for AI voice generation, Google Gemini for translation, and various audio/video processing libraries to create seamless dubbed content.
 
-**Core Purpose**: Transform videos into different languages by:
-1. Extracting and transcribing original audio
-2. Translating transcribed text to target language
-3. Generating dubbed audio with AI voices
-4. Synchronizing dubbed audio with original video timing
-5. Combining dubbed audio with original video
+**Core Purpose**: 
+- **Video Dubbing**: Transform videos into different languages by extracting audio, translating, generating dubbed audio, and synchronizing with original video timing
+- **YouTube Summarizer**: Download and transcribe YouTube videos, then generate AI-powered summaries with customizable word count
+- **Word to Story**: Create engaging stories from input words with themes, supporting English and Hindi with emotional audio narration
+- **Additional Tools**: Text-to-speech, speech-to-text, and text translation utilities
 
 **Technology Stack**:
 - **Frontend**: Streamlit web interface
@@ -93,6 +92,25 @@ The application is organized into specialized service modules:
   - Segment-based synchronization
 - **Technology**: Pydub for audio manipulation, optional Librosa for time-stretching
 - **Design Decision**: Segment-based approach allows precise control over timing while maintaining audio quality
+
+#### YouTube Summarizer Service (`youtube_summarizer.py`) - Added Oct 2025
+- **Purpose**: Download, transcribe, and summarize YouTube videos
+- **Key Capabilities**:
+  - Download YouTube videos using yt-dlp
+  - Extract and transcribe audio in chunks for long videos
+  - Generate AI-powered summaries with configurable word count
+- **Technology**: yt-dlp for downloading, SpeechRecognition for transcription, Google Gemini for summarization
+- **Design Decision**: Chunk-based transcription handles long videos efficiently; summary-only output (no full transcript) keeps UI focused
+
+#### Story Generator Service (`story_generator.py`) - Added Oct 2025
+- **Purpose**: Generate creative stories from input words with emotional audio narration
+- **Key Capabilities**:
+  - AI story generation based on user-provided words, theme, and word count
+  - Support for English and Hindi languages
+  - Emotional text-to-speech with enhanced voice settings
+  - Audio download functionality
+- **Technology**: Google Gemini for story generation, ElevenLabs for emotional TTS
+- **Design Decision**: Uses emotional voice settings (reduced stability, increased style) for engaging narration; graceful degradation when quota exceeded
 
 ### 3. Processing Pipeline Architecture
 
