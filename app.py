@@ -400,13 +400,14 @@ def render_text_to_speech(elevenlabs_client):
         else:
             try:
                 with st.spinner("Generating speech..."):
-                    audio = elevenlabs_client.generate(
+                    audio_generator = elevenlabs_client.text_to_speech.convert(
                         text=text_input,
-                        voice=voice_map[voice_id],
-                        model="eleven_multilingual_v2"
+                        voice_id=voice_map[voice_id],
+                        model_id="eleven_multilingual_v2",
+                        output_format="mp3_44100_128"
                     )
                     
-                    audio_bytes = b''.join(audio)
+                    audio_bytes = b''.join(audio_generator)
                     
                     st.audio(audio_bytes, format='audio/mpeg')
                     
