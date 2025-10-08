@@ -10,6 +10,8 @@ import speech_recognition as sr
 from elevenlabs import ElevenLabs
 from google import genai
 from pydub import AudioSegment
+from youtube_summarizer import YouTubeSummarizer
+from story_generator import StoryGenerator
 
 st.set_page_config(
     page_title="Anuvaad AI - Professional Video Dubbing",
@@ -525,6 +527,138 @@ def render_text_translation(gemini_client):
             except Exception as e:
                 st.error(f"❌ Translation failed: {str(e)}")
 
+def render_youtube_summarizer(youtube_summarizer):
+    st.markdown("### 📺 YouTube Video Summarizer")
+    
+    youtube_url = st.text_input(
+        "Enter YouTube URL",
+        placeholder="https://www.youtube.com/watch?v=...",
+        key="youtube_url"
+    )
+    
+    word_count = st.slider(
+        "Summary word count",
+        min_value=50,
+        max_value=500,
+        value=200,
+        step=50,
+        key="summary_words"
+    )
+    
+    if st.button("📝 Summarize Video", key="youtube_btn", use_container_width=True):
+        if not youtube_url.strip():
+            st.error("Please enter a YouTube URL")
+        else:
+            try:
+                with st.spinner("Processing... This may take a few minutes"):
+                    status = st.empty()
+                    
+                    status.info("⬇️ Downloading video...")
+                    time.sleep(0.5)
+                    
+                    status.info("🎤 Transcribing audio...")
+                    time.sleep(0.5)
+                    
+                    status.info("📄 Generating summary...")
+                    
+                    result = youtube_summarizer.process_youtube_video(youtube_url, word_count)
+                    
+                    if result:
+                        status.empty()
+                        
+                        st.markdown(f"##### 📹 Video: {result['title']}")
+                        st.markdown("##### 📝 Summary:")
+                        st.text_area("Summary", value=result['summary'], height=200, key="youtube_summary")
+                        
+                        st.success("✅ Summary generated successfully!")
+                    else:
+                        st.error("❌ Failed to process video. Please check the URL and try again.")
+                        
+            except Exception as e:
+                st.error(f"❌ Processing failed: {str(e)}")
+
+def render_word_to_story(story_generator):
+    st.markdown("### 📖 Word to Story")
+    
+    words_input = st.text_input(
+        "Enter words (comma-separated)",
+        placeholder="adventure, forest, mystery, courage",
+        key="story_words"
+    )
+    
+    theme = st.text_input(
+        "Story theme",
+        placeholder="Fantasy adventure, Mystery thriller, etc.",
+        key="story_theme"
+    )
+    
+    story_col1, story_col2 = st.columns(2)
+    
+    with story_col1:
+        word_count = st.slider(
+            "Story word count",
+            min_value=100,
+            max_value=1000,
+            value=300,
+            step=50,
+            key="story_word_count"
+        )
+    
+    with story_col2:
+        language = st.selectbox(
+            "Language",
+            ["English", "Hindi"],
+            key="story_language"
+        )
+    
+    if st.button("✨ Generate Story", key="story_btn", use_container_width=True):
+        if not words_input.strip():
+            st.error("Please enter some words")
+        elif not theme.strip():
+            st.error("Please enter a theme")
+        else:
+            try:
+                with st.spinner("Creating your story... This may take a moment"):
+                    words_list = [word.strip() for word in words_input.split(',')]
+                    
+                    status = st.empty()
+                    status.info("✍️ Writing story...")
+                    time.sleep(0.5)
+                    
+                    status.info("🎙️ Generating emotional narration...")
+                    
+                    result = story_generator.create_story_with_audio(
+                        words=words_list,
+                        theme=theme,
+                        word_count=word_count,
+                        language=language.lower()
+                    )
+                    
+                    if result and result['story']:
+                        status.empty()
+                        
+                        st.markdown("##### 📝 Your Story:")
+                        st.text_area("Story", value=result['story'], height=300, key="generated_story")
+                        
+                        if result['audio_bytes']:
+                            st.markdown("##### 🎧 Audio Narration:")
+                            st.audio(result['audio_bytes'], format='audio/mpeg')
+                            
+                            st.download_button(
+                                label="📥 Download Audio",
+                                data=result['audio_bytes'],
+                                file_name=f"story_{int(time.time())}.mp3",
+                                mime="audio/mpeg",
+                                key="story_audio_download"
+                            )
+                        
+                        st.success("✅ Story created successfully!")
+                    else:
+                        st.error("❌ Failed to generate story. Please try again.")
+                        
+            except Exception as e:
+                st.error(f"❌ Story generation failed: {str(e)}")
+
 @st.cache_resource
 def initialize_services():
     try:
@@ -533,21 +667,23 @@ def initialize_services():
         
         if not elevenlabs_api_key:
             st.error("🔑 ELEVENLABS_API_KEY environment variable not set")
-            return None, None, None, None
+            return None, None, None, None, None, None
         
         if not gemini_api_key:
             st.error("🔑 GEMINI_API_KEY environment variable not set")
-            return None, None, None, None
+            return None, None, None, None, None, None
         
         video_processor = VideoProcessor()
         dubbing_service = ElevenLabsDubbing(api_key=elevenlabs_api_key)
         elevenlabs_client = ElevenLabs(api_key=elevenlabs_api_key)
         gemini_client = genai.Client(api_key=gemini_api_key)
+        youtube_summarizer = YouTubeSummarizer(gemini_api_key=gemini_api_key)
+        story_generator = StoryGenerator(gemini_api_key=gemini_api_key, elevenlabs_api_key=elevenlabs_api_key)
         
-        return video_processor, dubbing_service, elevenlabs_client, gemini_client
+        return video_processor, dubbing_service, elevenlabs_client, gemini_client, youtube_summarizer, story_generator
     except Exception as e:
         st.error(f"❌ Failed to initialize services: {str(e)}")
-        return None, None, None, None
+        return None, None, None, None, None, None
 
 def main():
     st.markdown("""
@@ -571,7 +707,7 @@ def main():
         st.markdown('</div>', unsafe_allow_html=True)
         return
     
-    video_processor, dubbing_service, elevenlabs_client, gemini_client = services
+    video_processor, dubbing_service, elevenlabs_client, gemini_client, youtube_summarizer, story_generator = services
     
     st.markdown('<div class="content-section">', unsafe_allow_html=True)
     
@@ -670,7 +806,7 @@ def main():
     st.markdown("---")
     st.markdown('<h2 style="text-align: center; margin: 2rem 0;">Additional Features</h2>', unsafe_allow_html=True)
     
-    btn_col1, btn_col2, btn_col3 = st.columns(3, gap="medium")
+    btn_col1, btn_col2, btn_col3, btn_col4, btn_col5 = st.columns(5, gap="medium")
     
     with btn_col1:
         if st.button("🗣️ Text to Speech", key="tts_feature_btn", use_container_width=True):
@@ -684,6 +820,14 @@ def main():
         if st.button("🌐 Text Translation", key="trans_feature_btn", use_container_width=True):
             st.session_state.active_feature = "trans"
     
+    with btn_col4:
+        if st.button("📺 YouTube Summarizer", key="youtube_feature_btn", use_container_width=True):
+            st.session_state.active_feature = "youtube"
+    
+    with btn_col5:
+        if st.button("📖 Word to Story", key="story_feature_btn", use_container_width=True):
+            st.session_state.active_feature = "story"
+    
     if "active_feature" not in st.session_state:
         st.session_state.active_feature = None
     
@@ -693,6 +837,10 @@ def main():
         render_speech_to_text()
     elif st.session_state.active_feature == "trans":
         render_text_translation(gemini_client)
+    elif st.session_state.active_feature == "youtube":
+        render_youtube_summarizer(youtube_summarizer)
+    elif st.session_state.active_feature == "story":
+        render_word_to_story(story_generator)
     
     st.markdown('</div>', unsafe_allow_html=True)
     
