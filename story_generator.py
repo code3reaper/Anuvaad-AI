@@ -80,17 +80,19 @@ class StoryGenerator:
             lang_key = 'hindi' if language.lower() == 'hindi' else 'english'
             voice_id = self.voice_mapping[lang_key]['emotional']
             
+            from elevenlabs import VoiceSettings
+            
             audio_generator = self.elevenlabs_client.text_to_speech.convert(
                 text=story_text,
                 voice_id=voice_id,
                 model_id="eleven_multilingual_v2",
                 output_format="mp3_44100_128",
-                voice_settings={
-                    "stability": 0.5,
-                    "similarity_boost": 0.75,
-                    "style": 0.6,
-                    "use_speaker_boost": True
-                }
+                voice_settings=VoiceSettings(
+                    stability=0.5,
+                    similarity_boost=0.75,
+                    style=0.6,
+                    use_speaker_boost=True
+                )
             )
             
             audio_bytes = b''.join(audio_generator)
