@@ -178,22 +178,6 @@ st.markdown("""
         margin-bottom: 2rem;
     }
     
-    .feature-box-container {
-        background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(51, 65, 85, 0.6));
-        border: 2px solid rgba(96, 165, 250, 0.3);
-        border-radius: 16px;
-        padding: 1.5rem;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .feature-content {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-    
     .feature-button-wrapper {
         margin-top: auto;
         padding-top: 1rem;
@@ -869,38 +853,22 @@ def main():
     row1_col1, row1_col2 = st.columns(2, gap="large")
     
     with row1_col1:
-        st.markdown('<div class="feature-box-container">', unsafe_allow_html=True)
         st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">🎬 Video Dubbing</h3>', unsafe_allow_html=True)
-        st.markdown('<div class="feature-content">', unsafe_allow_html=True)
         render_video_dubbing(video_processor, dubbing_service)
-        st.markdown('</div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
     
     with row1_col2:
-        st.markdown('<div class="feature-box-container">', unsafe_allow_html=True)
         st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">📺 YouTube Summarizer</h3>', unsafe_allow_html=True)
-        st.markdown('<div class="feature-content">', unsafe_allow_html=True)
         render_youtube_summarizer(youtube_summarizer)
-        st.markdown('</div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
     
     row2_col1, row2_col2 = st.columns(2, gap="large")
     
     with row2_col1:
-        st.markdown('<div class="feature-box-container">', unsafe_allow_html=True)
         st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">📖 Word to Story</h3>', unsafe_allow_html=True)
-        st.markdown('<div class="feature-content">', unsafe_allow_html=True)
         render_word_to_story(story_generator)
-        st.markdown('</div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
     
     with row2_col2:
-        st.markdown('<div class="feature-box-container">', unsafe_allow_html=True)
         st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">🎙️ Article to Podcast</h3>', unsafe_allow_html=True)
-        st.markdown('<div class="feature-content">', unsafe_allow_html=True)
         render_article_to_podcast(article_podcast)
-        st.markdown('</div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
     
     st.markdown("---")
     st.markdown('<h2 style="text-align: center; margin: 2rem 0;">Additional Tools</h2>', unsafe_allow_html=True)
