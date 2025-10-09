@@ -195,29 +195,20 @@ st.markdown("""
         flex-direction: column;
     }
     
-    .feature-box {
+    div[data-testid="stVerticalBlockBorderWrapper"]:has(h3) {
         background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%) !important;
         border: 1px solid rgba(96, 165, 250, 0.3) !important;
         border-radius: 16px !important;
         padding: 2rem !important;
-        height: 100%;
-        display: block !important;
         backdrop-filter: blur(10px);
         box-shadow: 0 8px 32px rgba(59, 130, 246, 0.1) !important;
         transition: all 0.3s ease;
-        position: relative;
     }
     
-    .feature-box:hover {
+    div[data-testid="stVerticalBlockBorderWrapper"]:has(h3):hover {
         border-color: rgba(96, 165, 250, 0.5) !important;
         box-shadow: 0 12px 40px rgba(59, 130, 246, 0.2) !important;
         transform: translateY(-2px);
-    }
-    
-    .feature-box > div {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
     }
     
     .card-title {
@@ -890,38 +881,26 @@ def main():
     row1_col1, row1_col2 = st.columns(2, gap="large")
     
     with row1_col1:
-        st.markdown('<div class="feature-box">', unsafe_allow_html=True)
-        st.markdown('<div class="feature-content-wrapper">', unsafe_allow_html=True)
-        st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">🎬 Video Dubbing</h3>', unsafe_allow_html=True)
-        render_video_dubbing(video_processor, dubbing_service)
-        st.markdown('</div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">🎬 Video Dubbing</h3>', unsafe_allow_html=True)
+            render_video_dubbing(video_processor, dubbing_service)
     
     with row1_col2:
-        st.markdown('<div class="feature-box">', unsafe_allow_html=True)
-        st.markdown('<div class="feature-content-wrapper">', unsafe_allow_html=True)
-        st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">📺 YouTube Summarizer</h3>', unsafe_allow_html=True)
-        render_youtube_summarizer(youtube_summarizer)
-        st.markdown('</div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">📺 YouTube Summarizer</h3>', unsafe_allow_html=True)
+            render_youtube_summarizer(youtube_summarizer)
     
     row2_col1, row2_col2 = st.columns(2, gap="large")
     
     with row2_col1:
-        st.markdown('<div class="feature-box">', unsafe_allow_html=True)
-        st.markdown('<div class="feature-content-wrapper">', unsafe_allow_html=True)
-        st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">📖 Word to Story</h3>', unsafe_allow_html=True)
-        render_word_to_story(story_generator)
-        st.markdown('</div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">📖 Word to Story</h3>', unsafe_allow_html=True)
+            render_word_to_story(story_generator)
     
     with row2_col2:
-        st.markdown('<div class="feature-box">', unsafe_allow_html=True)
-        st.markdown('<div class="feature-content-wrapper">', unsafe_allow_html=True)
-        st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">🎙️ Article to Podcast</h3>', unsafe_allow_html=True)
-        render_article_to_podcast(article_podcast)
-        st.markdown('</div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">🎙️ Article to Podcast</h3>', unsafe_allow_html=True)
+            render_article_to_podcast(article_podcast)
     
     st.markdown("---")
     st.markdown('<h2 style="text-align: center; margin: 2rem 0;">Additional Tools</h2>', unsafe_allow_html=True)
