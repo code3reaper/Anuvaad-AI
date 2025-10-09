@@ -3,7 +3,7 @@ import tempfile
 import subprocess
 from typing import Optional, Dict, Callable
 from elevenlabs import ElevenLabs, VoiceSettings
-import google.generativeai as genai
+from google import genai
 
 class ArticleToPodcast:
     """Handles conversion of articles to multi-speaker podcast audio"""

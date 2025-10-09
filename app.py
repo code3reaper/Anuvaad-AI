@@ -12,6 +12,7 @@ from google import genai
 from pydub import AudioSegment
 from youtube_summarizer import YouTubeSummarizer
 from story_generator import StoryGenerator
+from article_to_podcast import ArticleToPodcast
 
 st.set_page_config(
     page_title="Anuvaad AI - Professional Video Dubbing",
@@ -653,13 +654,71 @@ def render_word_to_story(story_generator):
                             )
                             st.success("✅ Story created successfully with audio narration!")
                         else:
-                            st.warning("⚠️ Story created, but audio generation failed. This is likely due to insufficient ElevenLabs credits. Please check your ElevenLabs account quota.")
-                            st.info("💡 You can still read the story above. To get audio narration, please add credits to your ElevenLabs account at https://elevenlabs.io/")
+                            st.warning("⚠️ Story created, but audio generation failed. This may be due to API limitations.")
+                            st.info("💡 You can still read the story above. Audio narration will be available when API access is restored.")
                     else:
                         st.error("❌ Failed to generate story. Please try again.")
                         
             except Exception as e:
                 st.error(f"❌ Story generation failed: {str(e)}")
+
+def render_article_to_podcast(article_podcast):
+    st.markdown("### 🎙️ Article to Podcast")
+    
+    article_text = st.text_area(
+        "Enter news article or text",
+        placeholder="Paste your news article or any text here...",
+        height=200,
+        key="article_input"
+    )
+    
+    script_word_count = st.slider(
+        "Podcast script length (words)",
+        min_value=100,
+        max_value=500,
+        value=300,
+        step=50,
+        key="podcast_script_length"
+    )
+    
+    if st.button("🎧 Generate Podcast", key="podcast_btn", use_container_width=True):
+        if not article_text.strip():
+            st.error("Please enter an article or text")
+        else:
+            try:
+                with st.spinner("Creating your podcast... This may take a moment"):
+                    status = st.empty()
+                    
+                    def progress_callback(message, percent):
+                        status.info(f"{message}")
+                    
+                    audio_bytes = article_podcast.create_podcast_from_article(
+                        article_text=article_text,
+                        script_word_count=script_word_count,
+                        progress_callback=progress_callback
+                    )
+                    
+                    if audio_bytes:
+                        status.empty()
+                        
+                        st.markdown("##### 🎧 Your Podcast:")
+                        st.audio(audio_bytes, format='audio/mpeg')
+                        
+                        st.download_button(
+                            label="📥 Download Podcast",
+                            data=audio_bytes,
+                            file_name=f"podcast_{int(time.time())}.mp3",
+                            mime="audio/mpeg",
+                            key="podcast_download"
+                        )
+                        
+                        st.success("✅ Podcast created successfully!")
+                        st.info("💡 This podcast features a conversational format with a Host and an Expert discussing your article.")
+                    else:
+                        st.error("❌ Failed to generate podcast. Please try again.")
+                        
+            except Exception as e:
+                st.error(f"❌ Podcast generation failed: {str(e)}")
 
 @st.cache_resource
 def initialize_services():
@@ -668,12 +727,12 @@ def initialize_services():
         gemini_api_key = os.environ.get('GEMINI_API_KEY')
         
         if not elevenlabs_api_key:
-            st.error("🔑 ELEVENLABS_API_KEY environment variable not set")
-            return None, None, None, None, None, None
+            st.error("🔑 API key environment variable not set")
+            return None, None, None, None, None, None, None
         
         if not gemini_api_key:
             st.error("🔑 GEMINI_API_KEY environment variable not set")
-            return None, None, None, None, None, None
+            return None, None, None, None, None, None, None
         
         video_processor = VideoProcessor()
         dubbing_service = ElevenLabsDubbing(api_key=elevenlabs_api_key)
@@ -681,11 +740,12 @@ def initialize_services():
         gemini_client = genai.Client(api_key=gemini_api_key)
         youtube_summarizer = YouTubeSummarizer(gemini_api_key=gemini_api_key)
         story_generator = StoryGenerator(gemini_api_key=gemini_api_key, elevenlabs_api_key=elevenlabs_api_key)
+        article_podcast = ArticleToPodcast(gemini_api_key=gemini_api_key, elevenlabs_api_key=elevenlabs_api_key)
         
-        return video_processor, dubbing_service, elevenlabs_client, gemini_client, youtube_summarizer, story_generator
+        return video_processor, dubbing_service, elevenlabs_client, gemini_client, youtube_summarizer, story_generator, article_podcast
     except Exception as e:
         st.error(f"❌ Failed to initialize services: {str(e)}")
-        return None, None, None, None, None, None
+        return None, None, None, None, None, None, None
 
 def main():
     st.markdown("""
@@ -698,7 +758,7 @@ def main():
         <div class="hero">
             <h1>Transform Content<br>Across Languages</h1>
             <p>AI-powered video dubbing, text-to-speech, speech-to-text, and translation</p>
-            <span class="badge">✨ Powered by ElevenLabs & Google Gemini</span>
+            <span class="badge">✨ Powered by Advanced AI Technology</span>
         </div>
     """, unsafe_allow_html=True)
     
@@ -709,7 +769,7 @@ def main():
         st.markdown('</div>', unsafe_allow_html=True)
         return
     
-    video_processor, dubbing_service, elevenlabs_client, gemini_client, youtube_summarizer, story_generator = services
+    video_processor, dubbing_service, elevenlabs_client, gemini_client, youtube_summarizer, story_generator, article_podcast = services
     
     st.markdown('<div class="content-section">', unsafe_allow_html=True)
     
@@ -806,9 +866,29 @@ def main():
             """, unsafe_allow_html=True)
     
     st.markdown("---")
-    st.markdown('<h2 style="text-align: center; margin: 2rem 0;">Additional Features</h2>', unsafe_allow_html=True)
+    st.markdown('<h2 style="text-align: center; margin: 2rem 0;">More Features</h2>', unsafe_allow_html=True)
     
-    btn_col1, btn_col2, btn_col3, btn_col4, btn_col5 = st.columns(5, gap="medium")
+    main_feature_cols = st.columns(3, gap="large")
+    
+    with main_feature_cols[0]:
+        with st.container(border=True, key="youtube_feature"):
+            st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">📺 YouTube Summarizer</h3>', unsafe_allow_html=True)
+            render_youtube_summarizer(youtube_summarizer)
+    
+    with main_feature_cols[1]:
+        with st.container(border=True, key="story_feature"):
+            st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">📖 Word to Story</h3>', unsafe_allow_html=True)
+            render_word_to_story(story_generator)
+    
+    with main_feature_cols[2]:
+        with st.container(border=True, key="podcast_feature"):
+            st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">🎙️ Article to Podcast</h3>', unsafe_allow_html=True)
+            render_article_to_podcast(article_podcast)
+    
+    st.markdown("---")
+    st.markdown('<h2 style="text-align: center; margin: 2rem 0;">Additional Tools</h2>', unsafe_allow_html=True)
+    
+    btn_col1, btn_col2, btn_col3 = st.columns(3, gap="medium")
     
     with btn_col1:
         if st.button("🗣️ Text to Speech", key="tts_feature_btn", use_container_width=True):
@@ -822,14 +902,6 @@ def main():
         if st.button("🌐 Text Translation", key="trans_feature_btn", use_container_width=True):
             st.session_state.active_feature = "trans"
     
-    with btn_col4:
-        if st.button("📺 YouTube Summarizer", key="youtube_feature_btn", use_container_width=True):
-            st.session_state.active_feature = "youtube"
-    
-    with btn_col5:
-        if st.button("📖 Word to Story", key="story_feature_btn", use_container_width=True):
-            st.session_state.active_feature = "story"
-    
     if "active_feature" not in st.session_state:
         st.session_state.active_feature = None
     
@@ -839,16 +911,12 @@ def main():
         render_speech_to_text()
     elif st.session_state.active_feature == "trans":
         render_text_translation(gemini_client)
-    elif st.session_state.active_feature == "youtube":
-        render_youtube_summarizer(youtube_summarizer)
-    elif st.session_state.active_feature == "story":
-        render_word_to_story(story_generator)
     
     st.markdown('</div>', unsafe_allow_html=True)
     
     st.markdown("""
         <div class="footer">
-            <p>© 2025 Anuvaad AI - Powered by ElevenLabs Technology</p>
+            <p>© 2025 Anuvaad AI - Advanced AI Technology</p>
             <p style="font-size: 0.85rem; margin-top: 0.5rem;">Breaking language barriers with artificial intelligence</p>
         </div>
     """, unsafe_allow_html=True)
@@ -861,7 +929,7 @@ def process_video_with_elevenlabs(input_path, source_lang, target_lang, video_pr
     status_text = st.empty()
     
     try:
-        status_text.markdown("**📤 Uploading to ElevenLabs...**")
+        status_text.markdown("**📤 Uploading video...**")
         progress_bar.progress(10)
         time.sleep(0.5)
         
@@ -887,8 +955,7 @@ def process_video_with_elevenlabs(input_path, source_lang, target_lang, video_pr
         )
         
         if not dubbed_video_path:
-            st.error("❌ Failed to dub video. Please check your ElevenLabs API key and quota.")
-            st.info("🔗 Visit https://elevenlabs.io/ to check your account status")
+            st.error("❌ Failed to dub video. Please check your API configuration.")
             st.markdown('</div>', unsafe_allow_html=True)
             return
         
