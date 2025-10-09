@@ -195,6 +195,25 @@ st.markdown("""
         flex-direction: column;
     }
     
+    .feature-box {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+        border: 1px solid rgba(96, 165, 250, 0.3);
+        border-radius: 16px;
+        padding: 2rem;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(59, 130, 246, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .feature-box:hover {
+        border-color: rgba(96, 165, 250, 0.5);
+        box-shadow: 0 12px 40px rgba(59, 130, 246, 0.2);
+        transform: translateY(-2px);
+    }
+    
     .card-title {
         font-size: 1.5rem;
         font-weight: 700;
@@ -865,30 +884,38 @@ def main():
     row1_col1, row1_col2 = st.columns(2, gap="large")
     
     with row1_col1:
-        st.markdown('<div class="feature-column"><div class="feature-content-wrapper">', unsafe_allow_html=True)
+        st.markdown('<div class="feature-box">', unsafe_allow_html=True)
+        st.markdown('<div class="feature-content-wrapper">', unsafe_allow_html=True)
         st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">🎬 Video Dubbing</h3>', unsafe_allow_html=True)
         render_video_dubbing(video_processor, dubbing_service)
-        st.markdown('</div></div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
     
     with row1_col2:
-        st.markdown('<div class="feature-column"><div class="feature-content-wrapper">', unsafe_allow_html=True)
+        st.markdown('<div class="feature-box">', unsafe_allow_html=True)
+        st.markdown('<div class="feature-content-wrapper">', unsafe_allow_html=True)
         st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">📺 YouTube Summarizer</h3>', unsafe_allow_html=True)
         render_youtube_summarizer(youtube_summarizer)
-        st.markdown('</div></div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
     
     row2_col1, row2_col2 = st.columns(2, gap="large")
     
     with row2_col1:
-        st.markdown('<div class="feature-column"><div class="feature-content-wrapper">', unsafe_allow_html=True)
+        st.markdown('<div class="feature-box">', unsafe_allow_html=True)
+        st.markdown('<div class="feature-content-wrapper">', unsafe_allow_html=True)
         st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">📖 Word to Story</h3>', unsafe_allow_html=True)
         render_word_to_story(story_generator)
-        st.markdown('</div></div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
     
     with row2_col2:
-        st.markdown('<div class="feature-column"><div class="feature-content-wrapper">', unsafe_allow_html=True)
+        st.markdown('<div class="feature-box">', unsafe_allow_html=True)
+        st.markdown('<div class="feature-content-wrapper">', unsafe_allow_html=True)
         st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">🎙️ Article to Podcast</h3>', unsafe_allow_html=True)
         render_article_to_podcast(article_podcast)
-        st.markdown('</div></div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
     
     st.markdown("---")
     st.markdown('<h2 style="text-align: center; margin: 2rem 0;">Additional Tools</h2>', unsafe_allow_html=True)
