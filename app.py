@@ -178,6 +178,27 @@ st.markdown("""
         margin-bottom: 2rem;
     }
     
+    .feature-box-container {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(51, 65, 85, 0.6));
+        border: 2px solid rgba(96, 165, 250, 0.3);
+        border-radius: 16px;
+        padding: 1.5rem;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .feature-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .feature-button-wrapper {
+        margin-top: auto;
+        padding-top: 1rem;
+    }
+    
     .card-title {
         font-size: 1.5rem;
         font-weight: 700;
@@ -544,6 +565,7 @@ def render_youtube_summarizer(youtube_summarizer):
         key="summary_words"
     )
     
+    st.markdown('<div class="feature-button-wrapper">', unsafe_allow_html=True)
     if st.button("📝 Summarize Video", key="youtube_btn", use_container_width=True):
         if not youtube_url.strip():
             st.error("Please enter a YouTube URL")
@@ -575,6 +597,7 @@ def render_youtube_summarizer(youtube_summarizer):
                         
             except Exception as e:
                 st.error(f"❌ Processing failed: {str(e)}")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 def render_word_to_story(story_generator):
     words_input = st.text_input(
@@ -608,6 +631,7 @@ def render_word_to_story(story_generator):
             key="story_language"
         )
     
+    st.markdown('<div class="feature-button-wrapper">', unsafe_allow_html=True)
     if st.button("✨ Generate Story", key="story_btn", use_container_width=True):
         if not words_input.strip():
             st.error("Please enter some words")
@@ -657,9 +681,13 @@ def render_word_to_story(story_generator):
                         
             except Exception as e:
                 st.error(f"❌ Story generation failed: {str(e)}")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 def render_video_dubbing(video_processor, dubbing_service):
     input_video_path = None
+    video_uploaded = False
+    source_lang = "en"
+    target_lang = "hi"
     
     uploaded_file = st.file_uploader(
         "Choose your video file",
@@ -671,47 +699,51 @@ def render_video_dubbing(video_processor, dubbing_service):
     if uploaded_file is not None:
         if not validate_video_file(uploaded_file):
             st.error("❌ Invalid video file or file too large (max 100MB)")
-            return
+        else:
+            st.success(f"✅ Uploaded: {uploaded_file.name}")
+            video_uploaded = True
             
-        st.success(f"✅ Uploaded: {uploaded_file.name}")
-        
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp_file:
-            tmp_file.write(uploaded_file.read())
-            input_video_path = tmp_file.name
-        
-        col1, col2 = st.columns([1, 1])
-        
-        with col1:
-            st.markdown("**🌍 Source Language**")
-            source_lang = st.selectbox(
-                "From",
-                ["en", "hi", "es", "fr", "de", "it", "pt", "ja", "ko", "zh"],
-                format_func=lambda x: {
-                    "en": "🇬🇧 English", "hi": "🇮🇳 Hindi", "es": "🇪🇸 Spanish", 
-                    "fr": "🇫🇷 French", "de": "🇩🇪 German", "it": "🇮🇹 Italian",
-                    "pt": "🇵🇹 Portuguese", "ja": "🇯🇵 Japanese", 
-                    "ko": "🇰🇷 Korean", "zh": "🇨🇳 Chinese"
-                }.get(x, x),
-                label_visibility="collapsed",
-                key="dubbing_source_lang"
-            )
-        
-        with col2:
-            st.markdown("**🎯 Target Language**")
-            target_lang = st.selectbox(
-                "To",
-                ["hi", "en", "es", "fr", "de", "it", "pt", "ja", "ko", "zh"],
-                format_func=lambda x: {
-                    "en": "🇬🇧 English", "hi": "🇮🇳 Hindi", "es": "🇪🇸 Spanish", 
-                    "fr": "🇫🇷 French", "de": "🇩🇪 German", "it": "🇮🇹 Italian",
-                    "pt": "🇵🇹 Portuguese", "ja": "🇯🇵 Japanese", 
-                    "ko": "🇰🇷 Korean", "zh": "🇨🇳 Chinese"
-                }.get(x, x),
-                label_visibility="collapsed",
-                key="dubbing_target_lang"
-            )
-        
-        if st.button("🎙️ Start Dubbing", type="primary", use_container_width=True, key="start_dubbing_btn"):
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp_file:
+                tmp_file.write(uploaded_file.read())
+                input_video_path = tmp_file.name
+            
+            col1, col2 = st.columns([1, 1])
+            
+            with col1:
+                st.markdown("**🌍 Source Language**")
+                source_lang = st.selectbox(
+                    "From",
+                    ["en", "hi", "es", "fr", "de", "it", "pt", "ja", "ko", "zh"],
+                    format_func=lambda x: {
+                        "en": "🇬🇧 English", "hi": "🇮🇳 Hindi", "es": "🇪🇸 Spanish", 
+                        "fr": "🇫🇷 French", "de": "🇩🇪 German", "it": "🇮🇹 Italian",
+                        "pt": "🇵🇹 Portuguese", "ja": "🇯🇵 Japanese", 
+                        "ko": "🇰🇷 Korean", "zh": "🇨🇳 Chinese"
+                    }.get(x, x),
+                    label_visibility="collapsed",
+                    key="dubbing_source_lang"
+                )
+            
+            with col2:
+                st.markdown("**🎯 Target Language**")
+                target_lang = st.selectbox(
+                    "To",
+                    ["hi", "en", "es", "fr", "de", "it", "pt", "ja", "ko", "zh"],
+                    format_func=lambda x: {
+                        "en": "🇬🇧 English", "hi": "🇮🇳 Hindi", "es": "🇪🇸 Spanish", 
+                        "fr": "🇫🇷 French", "de": "🇩🇪 German", "it": "🇮🇹 Italian",
+                        "pt": "🇵🇹 Portuguese", "ja": "🇯🇵 Japanese", 
+                        "ko": "🇰🇷 Korean", "zh": "🇨🇳 Chinese"
+                    }.get(x, x),
+                    label_visibility="collapsed",
+                    key="dubbing_target_lang"
+                )
+    else:
+        st.info("📤 Upload a video file to start dubbing")
+    
+    st.markdown('<div class="feature-button-wrapper">', unsafe_allow_html=True)
+    if st.button("🎬 Dub Video", use_container_width=True, key="dub_video_btn", disabled=not video_uploaded):
+        if video_uploaded and input_video_path:
             process_video_with_elevenlabs(
                 input_video_path, 
                 source_lang, 
@@ -719,8 +751,7 @@ def render_video_dubbing(video_processor, dubbing_service):
                 video_processor,
                 dubbing_service
             )
-    else:
-        st.info("📤 Upload a video file to start dubbing")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 def render_article_to_podcast(article_podcast):
     article_text = st.text_area(
@@ -739,6 +770,7 @@ def render_article_to_podcast(article_podcast):
         key="podcast_script_length"
     )
     
+    st.markdown('<div class="feature-button-wrapper">', unsafe_allow_html=True)
     if st.button("🎧 Generate Podcast", key="podcast_btn", use_container_width=True):
         if not article_text.strip():
             st.error("Please enter an article or text")
@@ -777,6 +809,7 @@ def render_article_to_podcast(article_podcast):
                         
             except Exception as e:
                 st.error(f"❌ Podcast generation failed: {str(e)}")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 @st.cache_resource
 def initialize_services():
@@ -836,26 +869,38 @@ def main():
     row1_col1, row1_col2 = st.columns(2, gap="large")
     
     with row1_col1:
-        with st.container(border=True, key="dubbing_feature"):
-            st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">🎬 Video Dubbing</h3>', unsafe_allow_html=True)
-            render_video_dubbing(video_processor, dubbing_service)
+        st.markdown('<div class="feature-box-container">', unsafe_allow_html=True)
+        st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">🎬 Video Dubbing</h3>', unsafe_allow_html=True)
+        st.markdown('<div class="feature-content">', unsafe_allow_html=True)
+        render_video_dubbing(video_processor, dubbing_service)
+        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
     
     with row1_col2:
-        with st.container(border=True, key="youtube_feature"):
-            st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">📺 YouTube Summarizer</h3>', unsafe_allow_html=True)
-            render_youtube_summarizer(youtube_summarizer)
+        st.markdown('<div class="feature-box-container">', unsafe_allow_html=True)
+        st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">📺 YouTube Summarizer</h3>', unsafe_allow_html=True)
+        st.markdown('<div class="feature-content">', unsafe_allow_html=True)
+        render_youtube_summarizer(youtube_summarizer)
+        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
     
     row2_col1, row2_col2 = st.columns(2, gap="large")
     
     with row2_col1:
-        with st.container(border=True, key="story_feature"):
-            st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">📖 Word to Story</h3>', unsafe_allow_html=True)
-            render_word_to_story(story_generator)
+        st.markdown('<div class="feature-box-container">', unsafe_allow_html=True)
+        st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">📖 Word to Story</h3>', unsafe_allow_html=True)
+        st.markdown('<div class="feature-content">', unsafe_allow_html=True)
+        render_word_to_story(story_generator)
+        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
     
     with row2_col2:
-        with st.container(border=True, key="podcast_feature"):
-            st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">🎙️ Article to Podcast</h3>', unsafe_allow_html=True)
-            render_article_to_podcast(article_podcast)
+        st.markdown('<div class="feature-box-container">', unsafe_allow_html=True)
+        st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">🎙️ Article to Podcast</h3>', unsafe_allow_html=True)
+        st.markdown('<div class="feature-content">', unsafe_allow_html=True)
+        render_article_to_podcast(article_podcast)
+        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
     
     st.markdown("---")
     st.markdown('<h2 style="text-align: center; margin: 2rem 0;">Additional Tools</h2>', unsafe_allow_html=True)
