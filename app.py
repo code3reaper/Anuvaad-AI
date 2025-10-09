@@ -196,22 +196,28 @@ st.markdown("""
     }
     
     .feature-box {
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
-        border: 1px solid rgba(96, 165, 250, 0.3);
-        border-radius: 16px;
-        padding: 2rem;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%) !important;
+        border: 1px solid rgba(96, 165, 250, 0.3) !important;
+        border-radius: 16px !important;
+        padding: 2rem !important;
         height: 100%;
-        display: flex;
-        flex-direction: column;
+        display: block !important;
         backdrop-filter: blur(10px);
-        box-shadow: 0 8px 32px rgba(59, 130, 246, 0.1);
+        box-shadow: 0 8px 32px rgba(59, 130, 246, 0.1) !important;
         transition: all 0.3s ease;
+        position: relative;
     }
     
     .feature-box:hover {
-        border-color: rgba(96, 165, 250, 0.5);
-        box-shadow: 0 12px 40px rgba(59, 130, 246, 0.2);
+        border-color: rgba(96, 165, 250, 0.5) !important;
+        box-shadow: 0 12px 40px rgba(59, 130, 246, 0.2) !important;
         transform: translateY(-2px);
+    }
+    
+    .feature-box > div {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
     }
     
     .card-title {
