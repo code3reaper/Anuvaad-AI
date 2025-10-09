@@ -202,26 +202,29 @@ st.markdown("""
         flex-direction: column;
     }
     
-    div[data-testid="stVerticalBlockBorderWrapper"]:has(h3) {
+    div[data-testid="stVerticalBlockBorderWrapper"] {
         background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%) !important;
         border: 3px solid #60a5fa !important;
         border-radius: 16px !important;
         padding: 2rem !important;
         backdrop-filter: blur(10px);
-        box-shadow: 0 8px 32px rgba(59, 130, 246, 0.2) !important;
+        box-shadow: 0 8px 32px rgba(59, 130, 246, 0.2), 0 0 0 3px #60a5fa !important;
         transition: all 0.3s ease;
         min-height: 450px !important;
         display: flex !important;
         flex-direction: column !important;
+        outline: 3px solid #60a5fa !important;
+        outline-offset: -3px !important;
     }
     
-    div[data-testid="stVerticalBlockBorderWrapper"]:has(h3):hover {
+    div[data-testid="stVerticalBlockBorderWrapper"]:hover {
         border-color: #93c5fd !important;
-        box-shadow: 0 12px 40px rgba(59, 130, 246, 0.3) !important;
+        outline-color: #93c5fd !important;
+        box-shadow: 0 12px 40px rgba(59, 130, 246, 0.3), 0 0 0 3px #93c5fd !important;
         transform: translateY(-2px);
     }
     
-    div[data-testid="stVerticalBlockBorderWrapper"]:has(h3) > div {
+    div[data-testid="stVerticalBlockBorderWrapper"] > div {
         display: flex !important;
         flex-direction: column !important;
         height: 100% !important;
