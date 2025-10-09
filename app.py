@@ -183,6 +183,18 @@ st.markdown("""
         padding-top: 1rem;
     }
     
+    .feature-column {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    
+    .feature-content-wrapper {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
     .card-title {
         font-size: 1.5rem;
         font-weight: 700;
@@ -853,22 +865,30 @@ def main():
     row1_col1, row1_col2 = st.columns(2, gap="large")
     
     with row1_col1:
+        st.markdown('<div class="feature-column"><div class="feature-content-wrapper">', unsafe_allow_html=True)
         st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">🎬 Video Dubbing</h3>', unsafe_allow_html=True)
         render_video_dubbing(video_processor, dubbing_service)
+        st.markdown('</div></div>', unsafe_allow_html=True)
     
     with row1_col2:
+        st.markdown('<div class="feature-column"><div class="feature-content-wrapper">', unsafe_allow_html=True)
         st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">📺 YouTube Summarizer</h3>', unsafe_allow_html=True)
         render_youtube_summarizer(youtube_summarizer)
+        st.markdown('</div></div>', unsafe_allow_html=True)
     
     row2_col1, row2_col2 = st.columns(2, gap="large")
     
     with row2_col1:
+        st.markdown('<div class="feature-column"><div class="feature-content-wrapper">', unsafe_allow_html=True)
         st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">📖 Word to Story</h3>', unsafe_allow_html=True)
         render_word_to_story(story_generator)
+        st.markdown('</div></div>', unsafe_allow_html=True)
     
     with row2_col2:
+        st.markdown('<div class="feature-column"><div class="feature-content-wrapper">', unsafe_allow_html=True)
         st.markdown('<h3 style="text-align: center; margin: 0 0 1rem 0;">🎙️ Article to Podcast</h3>', unsafe_allow_html=True)
         render_article_to_podcast(article_podcast)
+        st.markdown('</div></div>', unsafe_allow_html=True)
     
     st.markdown("---")
     st.markdown('<h2 style="text-align: center; margin: 2rem 0;">Additional Tools</h2>', unsafe_allow_html=True)
