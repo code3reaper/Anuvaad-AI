@@ -186,24 +186,13 @@ st.markdown("""
     .feature-column {
         display: flex;
         flex-direction: column;
-        min-height: 400px;
+        height: 100%;
     }
     
     .feature-content-wrapper {
         flex: 1;
         display: flex;
         flex-direction: column;
-    }
-    
-    [data-testid="column"] {
-        display: flex !important;
-        flex-direction: column !important;
-    }
-    
-    [data-testid="column"] > div {
-        flex: 1 !important;
-        display: flex !important;
-        flex-direction: column !important;
     }
     
     .card-title {
