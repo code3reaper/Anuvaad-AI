@@ -197,18 +197,29 @@ st.markdown("""
     
     div[data-testid="stVerticalBlockBorderWrapper"]:has(h3) {
         background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%) !important;
-        border: 1px solid rgba(96, 165, 250, 0.3) !important;
+        border: 2px solid rgba(96, 165, 250, 0.6) !important;
         border-radius: 16px !important;
         padding: 2rem !important;
         backdrop-filter: blur(10px);
-        box-shadow: 0 8px 32px rgba(59, 130, 246, 0.1) !important;
+        box-shadow: 0 8px 32px rgba(59, 130, 246, 0.2) !important;
         transition: all 0.3s ease;
     }
     
     div[data-testid="stVerticalBlockBorderWrapper"]:has(h3):hover {
-        border-color: rgba(96, 165, 250, 0.5) !important;
-        box-shadow: 0 12px 40px rgba(59, 130, 246, 0.2) !important;
+        border-color: rgba(96, 165, 250, 0.8) !important;
+        box-shadow: 0 12px 40px rgba(59, 130, 246, 0.3) !important;
         transform: translateY(-2px);
+    }
+    
+    [data-testid="stTooltipIcon"] {
+        color: #60a5fa !important;
+        opacity: 1 !important;
+    }
+    
+    [data-testid="stTooltipIcon"] svg {
+        fill: #60a5fa !important;
+        width: 18px !important;
+        height: 18px !important;
     }
     
     .card-title {
