@@ -1,15 +1,29 @@
 import { useState } from 'react';
+import { useAuth } from '../AuthContext';
 import './Modal.css';
 
-function LoginModal({ onClose }) {
+function LoginModal({ onClose, onSwitchToSignup }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login:', { email, password, rememberMe });
-    onClose();
+    setError('');
+    setLoading(true);
+    
+    const result = await login(email, password);
+    
+    if (result.success) {
+      onClose();
+    } else {
+      setError(result.error);
+    }
+    
+    setLoading(false);
   };
 
   return (
@@ -18,6 +32,8 @@ function LoginModal({ onClose }) {
         <button className="modal-close" onClick={onClose}>&times;</button>
         
         <h2>Sign In</h2>
+        
+        {error && <div className="error-message">{error}</div>}
         
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -52,11 +68,17 @@ function LoginModal({ onClose }) {
             <a href="#" className="forgot-link">Forgot password?</a>
           </div>
           
-          <button type="submit" className="btn-submit">Sign In</button>
+          <button type="submit" className="btn-submit" disabled={loading}>
+            {loading ? 'Signing In...' : 'Sign In'}
+          </button>
         </form>
         
         <div className="modal-footer">
-          <p>New to Anuvaad AI? <a href="#" onClick={(e) => { e.preventDefault(); onClose(); }}>Sign up now</a></p>
+          <p>New to Anuvaad AI? <a href="#" onClick={(e) => { 
+            e.preventDefault(); 
+            onClose(); 
+            if (onSwitchToSignup) onSwitchToSignup();
+          }}>Sign up now</a></p>
         </div>
       </div>
     </div>

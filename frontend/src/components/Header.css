@@ -91,6 +91,29 @@
   background: #f40612;
 }
 
+.user-name {
+  color: #e5e5e5;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-right: 0.5rem;
+}
+
+.btn-logout {
+  padding: 0.5rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #E50914;
+  color: white;
+  border: none;
+}
+
+.btn-logout:hover {
+  background: #f40612;
+}
+
 @media (max-width: 768px) {
   .header-container {
     padding: 1rem 4%;

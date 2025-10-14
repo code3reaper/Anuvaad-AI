@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from './AuthContext';
 import './App.css';
 import Header from './components/Header';
 import Hero from './components/Hero';
@@ -6,6 +7,7 @@ import SearchBar from './components/SearchBar';
 import FeatureRow from './components/FeatureRow';
 import Footer from './components/Footer';
 import FeatureModal from './components/FeatureModal';
+import LoginModal from './components/LoginModal';
 import VideoDubbing from './components/VideoDubbing';
 import YoutubeSummarizer from './components/YoutubeSummarizer';
 import WordToStory from './components/WordToStory';
@@ -17,6 +19,8 @@ import TextTranslation from './components/TextTranslation';
 function App() {
   const [selectedFeature, setSelectedFeature] = useState(null);
   const [activeComponent, setActiveComponent] = useState(null);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   const coreFeatures = [
     {
@@ -137,10 +141,19 @@ function App() {
   ];
 
   const handleCardClick = (feature) => {
+    if (!isAuthenticated) {
+      setShowLoginPrompt(true);
+      return;
+    }
     setSelectedFeature(feature);
   };
 
   const handleFeatureAction = (feature) => {
+    if (!isAuthenticated) {
+      setShowLoginPrompt(true);
+      return;
+    }
+    
     setActiveComponent(feature.id);
     setSelectedFeature(null);
     
@@ -210,6 +223,13 @@ function App() {
         <FeatureModal 
           feature={selectedFeature} 
           onClose={() => setSelectedFeature(null)} 
+        />
+      )}
+      
+      {showLoginPrompt && (
+        <LoginModal 
+          onClose={() => setShowLoginPrompt(false)}
+          onSwitchToSignup={() => setShowLoginPrompt(false)}
         />
       )}
     </div>

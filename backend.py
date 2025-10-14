@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 import tempfile
 import os
 from pathlib import Path
@@ -17,9 +18,23 @@ from article_to_podcast import ArticleToPodcast
 import base64
 from werkzeug.utils import secure_filename
 import io
+from models import db, bcrypt, User, UserHistory
+from datetime import timedelta
 
 app = Flask(__name__)
 CORS(app)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'dev-secret-key-change-in-production')
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=30)
+
+db.init_app(app)
+bcrypt.init_app(app)
+jwt = JWTManager(app)
+
+with app.app_context():
+    db.create_all()
 
 elevenlabs_api_key = os.environ.get('ELEVENLABS_API_KEY')
 gemini_api_key = os.environ.get('GEMINI_API_KEY')
@@ -37,6 +52,121 @@ dubbing_projects = {}
 @app.route('/api/health', methods=['GET'])
 def health_check():
     return jsonify({'status': 'ok', 'message': 'Backend is running'})
+
+@app.route('/api/auth/signup', methods=['POST'])
+def signup():
+    try:
+        data = request.json
+        name = data.get('name')
+        email = data.get('email')
+        password = data.get('password')
+        
+        if not name or not email or not password:
+            return jsonify({'error': 'Name, email, and password are required'}), 400
+        
+        if User.query.filter_by(email=email).first():
+            return jsonify({'error': 'Email already exists'}), 400
+        
+        user = User(name=name, email=email)
+        user.set_password(password)
+        
+        db.session.add(user)
+        db.session.commit()
+        
+        access_token = create_access_token(identity=user.id)
+        
+        return jsonify({
+            'success': True,
+            'message': 'User created successfully',
+            'access_token': access_token,
+            'user': user.to_dict()
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/auth/login', methods=['POST'])
+def login():
+    try:
+        data = request.json
+        email = data.get('email')
+        password = data.get('password')
+        
+        if not email or not password:
+            return jsonify({'error': 'Email and password are required'}), 400
+        
+        user = User.query.filter_by(email=email).first()
+        
+        if not user or not user.check_password(password):
+            return jsonify({'error': 'Invalid email or password'}), 401
+        
+        access_token = create_access_token(identity=user.id)
+        
+        return jsonify({
+            'success': True,
+            'access_token': access_token,
+            'user': user.to_dict()
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/auth/me', methods=['GET'])
+@jwt_required()
+def get_current_user():
+    try:
+        user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+        
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        
+        return jsonify({
+            'success': True,
+            'user': user.to_dict()
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/history', methods=['GET', 'POST'])
+@jwt_required()
+def user_history():
+    try:
+        user_id = get_jwt_identity()
+        
+        if request.method == 'POST':
+            data = request.json
+            feature_type = data.get('feature_type')
+            feature_data = data.get('feature_data')
+            
+            history_entry = UserHistory(
+                user_id=user_id,
+                feature_type=feature_type,
+                feature_data=feature_data
+            )
+            
+            db.session.add(history_entry)
+            db.session.commit()
+            
+            return jsonify({
+                'success': True,
+                'message': 'History saved',
+                'history': history_entry.to_dict()
+            }), 201
+        
+        else:
+            history = UserHistory.query.filter_by(user_id=user_id).order_by(UserHistory.created_at.desc()).limit(50).all()
+            
+            return jsonify({
+                'success': True,
+                'history': [h.to_dict() for h in history]
+            })
+            
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/text-to-speech', methods=['POST'])
 def text_to_speech():
