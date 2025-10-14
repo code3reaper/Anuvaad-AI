@@ -11,11 +11,13 @@ Anuvaad AI is a professional video dubbing application that translates and dubs 
 - **Additional Tools**: Text-to-speech, speech-to-text, and text translation utilities
 
 **Technology Stack**:
-- **Frontend**: Streamlit web interface
+- **Frontend**: React (Vite) with Netflix-style UI - modern, responsive interface with hero section, feature cards, and modal previews
+- **Backend**: Flask REST API with JWT authentication
+- **Database**: SQLite for user accounts and history tracking
 - **Video Processing**: MoviePy, FFmpeg
 - **Audio Processing**: Pydub, SpeechRecognition, Librosa (optional)
 - **AI Services**: ElevenLabs (voice generation), Google Gemini (translation)
-- **Language**: Python 3.x
+- **Language**: Python 3.x (backend), JavaScript/React (frontend)
 
 ## User Preferences
 
@@ -23,17 +25,27 @@ Preferred communication style: Simple, everyday language.
 
 ## System Architecture
 
-### 1. Frontend Architecture (Streamlit-based UI)
+### 1. Frontend Architecture (React-based Netflix-style UI)
 
-**Design Pattern**: Single-page application with component-based layout
+**Design Pattern**: Single-page application with component-based architecture
 
-The application uses Streamlit's native components with extensive custom CSS styling:
-- **Styling Approach**: Custom CSS injected via `st.markdown()` to create a modern, gradient-based interface
-- **Layout**: Wide layout mode with collapsed sidebar for maximum content space
-- **Theme**: Dark theme with gradient background (slate colors: #0f172a → #1e293b → #334155)
+The application uses React with Vite for a modern, Netflix-inspired interface:
+- **Styling Approach**: Custom CSS with Netflix-like design patterns
+- **Hero Section**: Full-width background image with gradient overlay and call-to-action
+- **Feature Cards**: Image-based cards with hover effects that open detailed modal previews
+- **Layout**: Responsive design with sticky header navigation
+- **Theme**: Dark theme with Netflix-style red accents (#E50914)
 - **Typography**: Inter font family for modern, clean appearance
+- **Authentication**: Modal-based login/signup flows with JWT token management
 
-**Key Decision**: Streamlit was chosen for rapid prototyping and deployment, with custom CSS to overcome default styling limitations while maintaining simplicity.
+**Key Components**:
+- `Hero.jsx` - Full-width hero section with background image
+- `FeatureCard.jsx` - Individual feature cards with images
+- `FeatureModal.jsx` - Detailed modal view with feature images and information
+- `Header.jsx` - Sticky navigation with login/signup buttons
+- `AuthContext.jsx` - Authentication state management
+
+**Key Decision**: React was chosen for its component reusability and ability to create a polished Netflix-style UI with smooth interactions.
 
 ### 2. Backend Architecture (Modular Service Layer)
 
