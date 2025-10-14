@@ -7,14 +7,14 @@ import json
 # 1️⃣ Set your API keys
 # ---------------------------
 GEMINI_API_KEY = "AIzaSyBqp2PwIV4QgLIjo73mKmt7vyb-D1HnkhA"
-ELEVENLABS_API_KEY = "sk_e0c37fcfe5929ab0323a70ea6fdee02402a26d484e734288"
+ELEVENLABS_API_KEY = "sk_b8c6c84322c3f2e6dc4242bab781a0e46aa5dd742f1b82a5"
 
 if not GEMINI_API_KEY or not ELEVENLABS_API_KEY:
     exit("🚨 Please set both GEMINI_API_KEY and ELEVENLABS_API_KEY.")
 
 # ElevenLabs Voice IDs
-HOST_VOICE_ID = "pNInz6obpgDQGcFmaJgB"   # Adam
-EXPERT_VOICE_ID = "21m00Tcm4TlvDq8ikWAM" # Rachel
+HOST_VOICE_ID = "pNInz6obpgDQGcFmaJgB"  # Adam
+EXPERT_VOICE_ID = "21m00Tcm4TlvDq8ikWAM"  # Rachel
 
 # ---------------------------
 # 2️⃣ Hardcoded article
@@ -29,6 +29,7 @@ Japan Wednesday and allegedly refused to get the post mortem examination,
 who met Amneet Wednesday and confirmed that “although visibly shattered, she was
 furiously angry and has refused to get the post mortem done till justice is delivered”.
 """
+
 
 # ---------------------------
 # 3️⃣ Generate podcast script using Gemini (latest model)
@@ -81,7 +82,9 @@ Host: We'll continue following this story and provide updates in future episodes
 Expert: Stay tuned for more insights and discussions on critical news.
 """
 
+
 script = generate_podcast_script(article)
+
 
 # ---------------------------
 # 4️⃣ Generate audio for each line using ElevenLabs
@@ -96,7 +99,10 @@ def generate_audio_elevenlabs(text, voice_id, output_file):
     data = {
         "text": text,
         "model_id": "eleven_multilingual_v2",
-        "voice_settings": {"stability": 0.5, "similarity_boost": 0.75}
+        "voice_settings": {
+            "stability": 0.5,
+            "similarity_boost": 0.75
+        }
     }
     response = requests.post(url, headers=headers, json=data)
     if response.status_code == 200:
@@ -104,8 +110,10 @@ def generate_audio_elevenlabs(text, voice_id, output_file):
             f.write(response.content)
         return True
     else:
-        print(f"Error generating audio: {response.status_code} {response.text}")
+        print(
+            f"Error generating audio: {response.status_code} {response.text}")
         return False
+
 
 # ---------------------------
 # 5️⃣ Generate audio files for each line
@@ -124,7 +132,8 @@ with open(temp_file_list, "w") as f:
         if line.lower().startswith("host:"):
             speaker, text, voice_id = "Host", line[5:].strip(), HOST_VOICE_ID
         elif line.lower().startswith("expert:"):
-            speaker, text, voice_id = "Expert", line[7:].strip(), EXPERT_VOICE_ID
+            speaker, text, voice_id = "Expert", line[7:].strip(
+            ), EXPERT_VOICE_ID
         else:
             continue
 
@@ -142,9 +151,10 @@ with open(temp_file_list, "w") as f:
 if audio_files:
     output_podcast = "final_podcast.mp3"
     subprocess.run([
-        "ffmpeg", "-y", "-f", "concat", "-safe", "0",
-        "-i", temp_file_list, "-c", "copy", output_podcast
-    ], check=True)
+        "ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", temp_file_list,
+        "-c", "copy", output_podcast
+    ],
+                   check=True)
     print(f"\n🎉 Podcast generated successfully: {output_podcast}")
 else:
     print("❌ No audio files generated. Podcast creation failed.")
