@@ -51,7 +51,7 @@ c) Activate the virtual environment:
    - Mac/Linux: source venv/bin/activate
 
 d) Install Python dependencies:
-   pip install -r python_requirements.txt
+   pip install -r requirements.txt
 
 e) Create a .env file in the project root with your API keys:
    ELEVENLABS_API_KEY=your_elevenlabs_api_key_here
@@ -135,7 +135,7 @@ To use all features of Anuvaad AI, you need API keys from:
 
 Problem: "Module not found" error
 Solution: Make sure you've activated the virtual environment and installed
-         all dependencies using: pip install -r python_requirements.txt
+         all dependencies using: pip install -r requirements.txt
 
 Problem: "FFmpeg not found" error
 Solution: Install FFmpeg and make sure it's in your system PATH
@@ -168,7 +168,7 @@ To stop the servers:
 
 anuvaad-ai/
 ├── backend.py                 # Flask backend server
-├── python_requirements.txt    # Python dependencies
+├── requirements.txt           # Python dependencies
 ├── .env                       # API keys (create this file)
 ├── frontend/                  # React frontend
 │   ├── package.json          # Node dependencies
