@@ -4,6 +4,13 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 import tempfile
 import os
 from pathlib import Path
+
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    print("Warning: python-dotenv not installed. Install it with: pip install python-dotenv")
 import time
 from video_processor import VideoProcessor
 from elevenlabs_dubbing import ElevenLabsDubbing
