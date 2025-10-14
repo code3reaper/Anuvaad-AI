@@ -35,7 +35,6 @@ function Header({ onSearchChange }) {
             <nav className="nav-links">
               <a onClick={() => scrollToSection('hero')}>Home</a>
               <a onClick={() => scrollToSection('features')}>Features</a>
-              <a onClick={() => scrollToSection('tools')}>Tools</a>
               <a onClick={() => scrollToSection('footer')}>Contact</a>
             </nav>
           </div>
