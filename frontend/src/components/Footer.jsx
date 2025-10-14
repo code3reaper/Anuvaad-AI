@@ -1,6 +1,13 @@
 import './Footer.css';
 
 function Footer() {
+  const scrollToFAQ = () => {
+    const element = document.getElementById('faq');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <footer id="footer" className="netflix-footer">
       <div className="footer-container">
@@ -16,7 +23,7 @@ function Footer() {
             <h3>Support</h3>
             <a href="#">Help Center</a>
             <a href="#">Contact Us</a>
-            <a href="#">FAQ</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); scrollToFAQ(); }}>FAQ</a>
           </div>
           
           <div className="footer-column">

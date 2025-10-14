@@ -5,6 +5,8 @@ import Header from './components/Header';
 import Hero from './components/Hero';
 import SearchBar from './components/SearchBar';
 import FeatureRow from './components/FeatureRow';
+import Reasons from './components/Reasons';
+import FAQ from './components/FAQ';
 import Footer from './components/Footer';
 import FeatureModal from './components/FeatureModal';
 import LoginModal from './components/LoginModal';
@@ -20,6 +22,8 @@ function App() {
   const [selectedFeature, setSelectedFeature] = useState(null);
   const [activeComponent, setActiveComponent] = useState(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [searchResults, setSearchResults] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const { isAuthenticated } = useAuth();
 
   const coreFeatures = [
@@ -165,8 +169,34 @@ function App() {
     }, 100);
   };
 
-  const handleSearch = (searchTerm) => {
-    console.log('Searching for:', searchTerm);
+  const handleSearch = (term) => {
+    if (!term.trim()) {
+      setSearchResults(null);
+      setSearchTerm('');
+      return;
+    }
+
+    setSearchTerm(term);
+    const allFeatures = [...coreFeatures, ...advancedTools];
+    const results = allFeatures.filter(feature => 
+      feature.title.toLowerCase().includes(term.toLowerCase()) ||
+      feature.shortDesc.toLowerCase().includes(term.toLowerCase()) ||
+      feature.description.toLowerCase().includes(term.toLowerCase())
+    );
+    
+    setSearchResults(results);
+    
+    setTimeout(() => {
+      const element = document.getElementById('search-results');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
+  };
+
+  const clearSearch = () => {
+    setSearchResults(null);
+    setSearchTerm('');
   };
 
   const getActiveComponent = () => {
@@ -184,6 +214,39 @@ function App() {
       <Hero />
       
       <SearchBar onSearch={handleSearch} />
+      
+      {searchResults !== null && (
+        <section id="search-results" className="search-results-section">
+          <div className="search-results-container">
+            <div className="search-results-header">
+              <h2>Search Results for "{searchTerm}"</h2>
+              <button className="clear-search-btn" onClick={clearSearch}>
+                ✕ Clear Search
+              </button>
+            </div>
+            {searchResults.length > 0 ? (
+              <div className="search-results-grid">
+                {searchResults.map((feature, idx) => (
+                  <div 
+                    key={idx} 
+                    className="search-result-card"
+                    onClick={() => handleCardClick({ ...feature, action: () => handleFeatureAction(feature) })}
+                  >
+                    <div className="search-result-icon">{feature.icon}</div>
+                    <h3>{feature.title}</h3>
+                    <p>{feature.shortDesc}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="no-results">
+                <p>No features found matching "{searchTerm}"</p>
+                <button className="btn-clear" onClick={clearSearch}>View All Features</button>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
       
       <section id="features" className="features-section">
         <FeatureRow 
@@ -216,6 +279,10 @@ function App() {
           </div>
         </section>
       )}
+      
+      <Reasons />
+      
+      <FAQ />
       
       <Footer />
       
