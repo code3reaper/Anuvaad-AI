@@ -73,7 +73,7 @@ def signup():
         db.session.add(user)
         db.session.commit()
         
-        access_token = create_access_token(identity=user.id)
+        access_token = create_access_token(identity=str(user.id))
         
         return jsonify({
             'success': True,
@@ -101,7 +101,7 @@ def login():
         if not user or not user.check_password(password):
             return jsonify({'error': 'Invalid email or password'}), 401
         
-        access_token = create_access_token(identity=user.id)
+        access_token = create_access_token(identity=str(user.id))
         
         return jsonify({
             'success': True,
@@ -116,7 +116,7 @@ def login():
 @jwt_required()
 def get_current_user():
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         user = User.query.get(user_id)
         
         if not user:
@@ -134,7 +134,7 @@ def get_current_user():
 @jwt_required()
 def user_history():
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         
         if request.method == 'POST':
             data = request.json
