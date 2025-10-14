@@ -440,5 +440,12 @@ def download_dubbed_video(dubbing_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/attached_assets/<path:filename>')
+def serve_attached_assets(filename):
+    try:
+        return send_file(os.path.join('attached_assets', filename))
+    except Exception as e:
+        return jsonify({'error': str(e)}), 404
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=False, use_reloader=False)
