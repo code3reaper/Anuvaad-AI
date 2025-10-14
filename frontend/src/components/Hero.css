@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 100%), 
-              url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"><rect fill="%23141414" width="1920" height="1080"/><circle cx="400" cy="300" r="200" fill="%23E50914" opacity="0.1"/><circle cx="1500" cy="700" r="250" fill="%23E50914" opacity="0.1"/><circle cx="900" cy="500" r="150" fill="%23E50914" opacity="0.15"/></svg>');
+              url('/attached_assets/stock_images/ai_technology_video__ae02401c.jpg');
   background-size: cover;
   background-position: center;
   margin-top: 70px;

@@ -8,6 +8,12 @@ function FeatureModal({ feature, onClose }) {
       <div className="modal-content feature-modal" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose}>&times;</button>
         
+        {feature.image && (
+          <div className="feature-modal-image">
+            <img src={feature.image} alt={feature.title} />
+          </div>
+        )}
+        
         <div className="feature-modal-header">
           <span className="feature-icon">{feature.icon}</span>
           <h2>{feature.title}</h2>

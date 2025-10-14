@@ -31,6 +31,7 @@ function App() {
         'High-quality audio output',
         'Batch processing support'
       ],
+      image: '/attached_assets/stock_images/video_dubbing_microp_c08e1bb8.jpg',
       component: VideoDubbing,
       id: 'video-dubbing'
     },
@@ -46,6 +47,7 @@ function App() {
         'Multi-language support',
         'Customizable summary length'
       ],
+      image: '/attached_assets/stock_images/youtube_video_conten_6e650ebb.jpg',
       component: YoutubeSummarizer,
       id: 'youtube-summarizer'
     },
@@ -61,6 +63,7 @@ function App() {
         'Character development',
         'Plot structure optimization'
       ],
+      image: '/attached_assets/stock_images/creative_storytellin_0ade6655.jpg',
       component: WordToStory,
       id: 'word-to-story'
     },
@@ -76,6 +79,7 @@ function App() {
         'Professional audio quality',
         'MP3 export format'
       ],
+      image: '/attached_assets/stock_images/podcast_microphone_a_4eec9237.jpg',
       component: ArticleToPodcast,
       id: 'article-to-podcast'
     }
@@ -94,6 +98,7 @@ function App() {
         'High-quality audio',
         'Batch conversion'
       ],
+      image: '/attached_assets/stock_images/text_to_speech_ai_te_2a30ee21.jpg',
       component: TextToSpeech,
       id: 'text-to-speech'
     },
@@ -109,6 +114,7 @@ function App() {
         'Timestamp generation',
         'Speaker identification'
       ],
+      image: '/attached_assets/stock_images/speech_recognition_v_e7a309ac.jpg',
       component: SpeechToText,
       id: 'speech-to-text'
     },
@@ -124,6 +130,7 @@ function App() {
         'Idiomatic expressions',
         'Batch translation support'
       ],
+      image: '/attached_assets/stock_images/translation_language_3cf3ff8e.jpg',
       component: TextTranslation,
       id: 'text-translation'
     }
