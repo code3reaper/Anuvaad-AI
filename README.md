@@ -324,7 +324,7 @@ MIT License — Free to use, modify, and distribute with attribution.
 
 🐛 Report issues on GitHub
 
-💌 Email: [support@anuvaad-ai.com](mailto:support@anuvaad-ai.com)
+💌 Email: [prakhar.244710@gmail.com](mailto:prakhar.244710@gmail.com)
 
 </div>
 
