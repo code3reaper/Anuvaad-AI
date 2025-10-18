@@ -1,7 +1,6 @@
 import os
 import tempfile
 from google import genai
-from elevenlabs import ElevenLabs
 from typing import Optional, Dict, List
 
 
@@ -11,7 +10,26 @@ class StoryGenerator:
     def __init__(self, gemini_api_key: str, elevenlabs_api_key: str):
         """Initialize story generator with Gemini and ElevenLabs APIs"""
         self.gemini_client = genai.Client(api_key=gemini_api_key)
-        self.elevenlabs_client = ElevenLabs(api_key=elevenlabs_api_key)
+        # Lazy/robust import of ElevenLabs client — some elevenlabs SDKs expose client in different modules
+        try:
+            # Preferred import path
+            from elevenlabs.client import ElevenLabs as _ElevenLabsClass
+        except Exception:
+            try:
+                # Fallback to top-level export (if present)
+                from elevenlabs import ElevenLabs as _ElevenLabsClass
+            except Exception as _e:
+                _ElevenLabsClass = None
+                print("Warning: ElevenLabs client not available; voice features will be disabled:", _e)
+
+        if _ElevenLabsClass is not None and elevenlabs_api_key:
+            try:
+                self.elevenlabs_client = _ElevenLabsClass(api_key=elevenlabs_api_key)
+            except Exception as _e:
+                self.elevenlabs_client = None
+                print("Warning: failed to initialize ElevenLabs client:", _e)
+        else:
+            self.elevenlabs_client = None
         
         self.voice_mapping = {
             'english': {

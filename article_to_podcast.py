@@ -2,7 +2,6 @@ import os
 import tempfile
 import subprocess
 from typing import Optional, Dict, Callable
-from elevenlabs import ElevenLabs, VoiceSettings
 from google import genai
 
 class ArticleToPodcast:
@@ -11,7 +10,35 @@ class ArticleToPodcast:
     def __init__(self, gemini_api_key: str, elevenlabs_api_key: str):
         """Initialize article to podcast service with Gemini and ElevenLabs APIs"""
         self.gemini_client = genai.Client(api_key=gemini_api_key)
-        self.elevenlabs_client = ElevenLabs(api_key=elevenlabs_api_key)
+        # Lazy import for ElevenLabs client and VoiceSettings to avoid ImportError at module import time
+        try:
+            from elevenlabs.client import ElevenLabs as _ElevenLabsClass
+        except Exception:
+            try:
+                from elevenlabs import ElevenLabs as _ElevenLabsClass
+            except Exception as _e:
+                _ElevenLabsClass = None
+                print("Warning: ElevenLabs client not available in ArticleToPodcast:", _e)
+
+        try:
+            # Try preferred import for VoiceSettings type
+            from elevenlabs.types.voice_settings import VoiceSettings as _VoiceSettings
+        except Exception:
+            try:
+                from elevenlabs import VoiceSettings as _VoiceSettings
+            except Exception:
+                _VoiceSettings = None
+
+        if _ElevenLabsClass is not None and elevenlabs_api_key:
+            try:
+                self.elevenlabs_client = _ElevenLabsClass(api_key=elevenlabs_api_key)
+            except Exception as _e:
+                self.elevenlabs_client = None
+                print("Warning: failed to initialize ElevenLabs client in ArticleToPodcast:", _e)
+        else:
+            self.elevenlabs_client = None
+
+        self._VoiceSettings = _VoiceSettings
         
         # Voice mapping for different speakers
         self.host_voice_id = "pNInz6obpgDQGcFmaJgB"    # Adam - Host voice
@@ -72,24 +99,46 @@ Expert: My pleasure. It's important to stay informed about these developments.""
         Generate audio for a single speaker line using ElevenLabs
         Returns: True if successful, False otherwise
         """
+        if not self.elevenlabs_client:
+            print("ElevenLabs client not initialized; cannot generate audio.")
+            return False
+
         try:
-            audio_generator = self.elevenlabs_client.text_to_speech.convert(
+            voice_settings = None
+            if self._VoiceSettings is not None:
+                try:
+                    voice_settings = self._VoiceSettings(
+                        stability=0.5,
+                        similarity_boost=0.75
+                    )
+                except Exception:
+                    voice_settings = None
+
+            # Newer SDKs expose text_to_speech client under .text_to_speech
+            try:
+                tts_client = self.elevenlabs_client.text_to_speech
+            except Exception:
+                tts_client = getattr(self.elevenlabs_client, 'text_to_speech', None)
+
+            if not tts_client:
+                # Fallback to direct HTTP approach is possible, but here we simply fail gracefully
+                print("ElevenLabs text_to_speech client not available on elevenlabs client instance.")
+                return False
+
+            audio_generator = tts_client.convert(
                 text=text,
                 voice_id=voice_id,
                 model_id="eleven_multilingual_v2",
                 output_format="mp3_44100_128",
-                voice_settings=VoiceSettings(
-                    stability=0.5,
-                    similarity_boost=0.75
-                )
+                voice_settings=voice_settings
             )
-            
+
             with open(output_file, 'wb') as f:
                 for chunk in audio_generator:
                     f.write(chunk)
-            
+
             return True
-            
+
         except Exception as e:
             print(f"Error generating audio: {e}")
             return False

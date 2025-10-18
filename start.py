@@ -10,6 +10,7 @@ import subprocess
 import signal
 import time
 from pathlib import Path
+import shutil
 
 def check_env_file():
     """Check if .env file exists"""
@@ -33,12 +34,22 @@ def check_dependencies():
     except (subprocess.CalledProcessError, FileNotFoundError):
         print("❌ Node.js is not installed. Please install it from https://nodejs.org/")
         sys.exit(1)
-    
+    # Check npm presence (on Windows npm may be available as npm.cmd)
+    # expose npm executable path for other functions
+    npm_exec = shutil.which('npm') or shutil.which('npm.cmd')
+    global NPM_EXEC
+    NPM_EXEC = npm_exec
+    if not npm_exec:
+        print("\n❌ npm was not found on your PATH. Node.js may be installed but npm is missing.")
+        print("   Install Node.js from https://nodejs.org/ or ensure npm is on your PATH.")
+        print("   You can check by running: npm --version")
+        sys.exit(1)
+
     # Check if frontend dependencies are installed
     if not os.path.exists('frontend/node_modules'):
         print("\n📦 Installing frontend dependencies...")
         try:
-            subprocess.run(['npm', 'install'], cwd='frontend', check=True)
+            subprocess.run([npm_exec, 'install'], cwd='frontend', check=True)
             print("✅ Frontend dependencies installed")
         except subprocess.CalledProcessError:
             print("❌ Failed to install frontend dependencies")
@@ -58,27 +69,30 @@ def start_servers():
         # Start backend
         print("\n📡 Starting Backend Server (Flask)...")
         backend_process = subprocess.Popen(
-            [sys.executable, 'backend.py'],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=1
+            [sys.executable, 'backend.py']
         )
-        processes.append(backend_process)
-        time.sleep(2)  # Give backend time to start
-        print("✅ Backend started on http://localhost:5001")
+        processes.append(('backend', backend_process))
+        # Give backend time to start and read the actual port from backend_port.txt
+        time.sleep(1)
+        backend_port = 5001
+        for _ in range(10):
+            try:
+                with open('backend_port.txt', 'r') as f:
+                    backend_port = int(f.read().strip())
+                    break
+            except Exception:
+                time.sleep(0.5)
+
+        print(f"✅ Backend started on http://localhost:{backend_port}")
         
         # Start frontend
         print("\n🎨 Starting Frontend Server (Vite)...")
+        frontend_cmd = [NPM_EXEC, 'run', 'dev', '--', '--host', '0.0.0.0', '--port', '5000']
         frontend_process = subprocess.Popen(
-            ['npm', 'run', 'dev', '--', '--host', '0.0.0.0', '--port', '5000'],
-            cwd='frontend',
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=1
+            frontend_cmd,
+            cwd='frontend'
         )
-        processes.append(frontend_process)
+        processes.append(('frontend', frontend_process))
         time.sleep(3)  # Give frontend time to start
         
         print("\n" + "="*60)
@@ -87,7 +101,7 @@ def start_servers():
         print("\n🌐 Open your browser and go to:")
         print("   👉 http://localhost:5000")
         print("\n📊 Backend API running at:")
-        print("   👉 http://localhost:5001")
+        print(f"   👉 http://localhost:{backend_port}")
         print("\n⏹️  Press Ctrl+C to stop both servers")
         print("="*60 + "\n")
         
@@ -96,19 +110,22 @@ def start_servers():
             time.sleep(1)
             
             # Check if any process has died
-            for proc in processes:
+            for name, proc in processes:
                 if proc.poll() is not None:
-                    print(f"\n❌ A server process stopped unexpectedly")
+                    print(f"\n❌ A server process ('{name}') stopped unexpectedly with exit code {proc.returncode}")
                     raise KeyboardInterrupt
                     
     except KeyboardInterrupt:
         print("\n\n⏹️  Stopping servers...")
-        for proc in processes:
+        for name, proc in processes:
             try:
                 proc.terminate()
                 proc.wait(timeout=5)
-            except:
-                proc.kill()
+            except Exception:
+                try:
+                    proc.kill()
+                except Exception:
+                    pass
         print("✅ All servers stopped")
         print("\nThank you for using Anuvaad AI! 👋\n")
         sys.exit(0)

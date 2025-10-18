@@ -3,14 +3,22 @@ import requests
 import subprocess
 import json
 
+# Load environment variables from .env (if python-dotenv is available)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except Exception:
+    # dotenv not installed or failed to load; environment variables may still be present
+    pass
+
 # ---------------------------
-# 1️⃣ Set your API keys
+# 1️⃣ Read API keys from environment
 # ---------------------------
-GEMINI_API_KEY = "AIzaSyBqp2PwIV4QgLIjo73mKmt7vyb-D1HnkhA"
-ELEVENLABS_API_KEY = "sk_b8c6c84322c3f2e6dc4242bab781a0e46aa5dd742f1b82a5"
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
+ELEVENLABS_API_KEY = os.environ.get('ELEVENLABS_API_KEY')
 
 if not GEMINI_API_KEY or not ELEVENLABS_API_KEY:
-    exit("🚨 Please set both GEMINI_API_KEY and ELEVENLABS_API_KEY.")
+    exit("🚨 Please set both GEMINI_API_KEY and ELEVENLABS_API_KEY in your environment or .env file.")
 
 # ElevenLabs Voice IDs
 HOST_VOICE_ID = "pNInz6obpgDQGcFmaJgB"  # Adam

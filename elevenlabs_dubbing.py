@@ -1,15 +1,27 @@
 import os
 import time
 import tempfile
-from elevenlabs.client import ElevenLabs
 from typing import Optional, Dict
+
+# Lazy import ElevenLabs client to avoid ImportError at module import time
+try:
+    from elevenlabs.client import ElevenLabs as _ElevenLabsClass
+except Exception:
+    try:
+        from elevenlabs import ElevenLabs as _ElevenLabsClass
+    except Exception as _e:
+        _ElevenLabsClass = None
+        print("Warning: ElevenLabs client not available in elevenlabs_dubbing:", _e)
 
 class ElevenLabsDubbing:
     """Handles video dubbing using ElevenLabs Dubbing API"""
     
     def __init__(self, api_key: str):
         """Initialize ElevenLabs dubbing service"""
-        self.client = ElevenLabs(api_key=api_key)
+        if _ElevenLabsClass is None:
+            raise RuntimeError("ElevenLabs SDK client is not available; install compatible 'elevenlabs' package")
+
+        self.client = _ElevenLabsClass(api_key=api_key)
         
         # Language code mapping
         self.language_codes = {

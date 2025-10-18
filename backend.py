@@ -16,7 +16,13 @@ from video_processor import VideoProcessor
 from elevenlabs_dubbing import ElevenLabsDubbing
 from utils import format_time, validate_video_file
 import speech_recognition as sr
-from elevenlabs import ElevenLabs
+try:
+    from elevenlabs import ElevenLabs
+    _ELEVENLABS_IMPORT_ERROR = None
+except Exception as _e:
+    ElevenLabs = None
+    _ELEVENLABS_IMPORT_ERROR = _e
+    print("Warning: failed to import 'elevenlabs' package:", _e)
 from google import genai
 from pydub import AudioSegment
 from youtube_summarizer import YouTubeSummarizer
@@ -27,6 +33,7 @@ from werkzeug.utils import secure_filename
 import io
 from models import db, bcrypt, User, UserHistory
 from datetime import timedelta
+import socket
 
 app = Flask(__name__)
 CORS(app)
@@ -47,12 +54,56 @@ elevenlabs_api_key = os.environ.get('ELEVENLABS_API_KEY')
 gemini_api_key = os.environ.get('GEMINI_API_KEY')
 
 video_processor = VideoProcessor()
-dubbing_service = ElevenLabsDubbing(api_key=elevenlabs_api_key) if elevenlabs_api_key else None
-elevenlabs_client = ElevenLabs(api_key=elevenlabs_api_key) if elevenlabs_api_key else None
-gemini_client = genai.Client(api_key=gemini_api_key) if gemini_api_key else None
-youtube_summarizer = YouTubeSummarizer(gemini_api_key=gemini_api_key) if gemini_api_key else None
-story_generator = StoryGenerator(gemini_api_key=gemini_api_key, elevenlabs_api_key=elevenlabs_api_key) if gemini_api_key and elevenlabs_api_key else None
-article_podcast = ArticleToPodcast(gemini_api_key=gemini_api_key, elevenlabs_api_key=elevenlabs_api_key) if gemini_api_key and elevenlabs_api_key else None
+
+# Initialize dubbing/elevenlabs clients safely — do not crash on import/init errors
+dubbing_service = None
+elevenlabs_client = None
+if elevenlabs_api_key:
+    try:
+        dubbing_service = ElevenLabsDubbing(api_key=elevenlabs_api_key)
+    except Exception as _e:
+        print("Warning: failed to initialize ElevenLabsDubbing:", _e)
+
+    if ElevenLabs is not None:
+        try:
+            elevenlabs_client = ElevenLabs(api_key=elevenlabs_api_key)
+        except Exception as _e:
+            elevenlabs_client = None
+            print("Warning: failed to initialize ElevenLabs client:", _e)
+    else:
+        print("ElevenLabs SDK not available; ElevenLabs features will be disabled.")
+
+gemini_client = None
+if gemini_api_key:
+    try:
+        gemini_client = genai.Client(api_key=gemini_api_key)
+    except Exception as _e:
+        gemini_client = None
+        print("Warning: failed to initialize Gemini client:", _e)
+
+youtube_summarizer = None
+if gemini_api_key:
+    try:
+        youtube_summarizer = YouTubeSummarizer(gemini_api_key=gemini_api_key)
+    except Exception as _e:
+        youtube_summarizer = None
+        print("Warning: failed to initialize YouTubeSummarizer:", _e)
+
+story_generator = None
+if gemini_api_key and elevenlabs_api_key:
+    try:
+        story_generator = StoryGenerator(gemini_api_key=gemini_api_key, elevenlabs_api_key=elevenlabs_api_key)
+    except Exception as _e:
+        story_generator = None
+        print("Warning: failed to initialize StoryGenerator:", _e)
+
+article_podcast = None
+if gemini_api_key and elevenlabs_api_key:
+    try:
+        article_podcast = ArticleToPodcast(gemini_api_key=gemini_api_key, elevenlabs_api_key=elevenlabs_api_key)
+    except Exception as _e:
+        article_podcast = None
+        print("Warning: failed to initialize ArticleToPodcast:", _e)
 
 dubbing_projects = {}
 
@@ -454,5 +505,53 @@ def serve_attached_assets(filename):
     except Exception as e:
         return jsonify({'error': str(e)}), 404
 
+def _find_free_port(start_port=5001, max_tries=100, host='127.0.0.1'):
+    """Return a free port on the given host starting from start_port."""
+    for i in range(max_tries):
+        port = start_port + i
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            try:
+                s.bind((host, port))
+                # success, port is free
+                return port
+            except OSError:
+                continue
+    raise RuntimeError(f"No free port found in range {start_port}-{start_port+max_tries-1}")
+
+
+def _write_port_file(port, path='backend_port.txt'):
+    try:
+        with open(path, 'w') as f:
+            f.write(str(port))
+    except Exception:
+        pass
+
+
+def _find_and_run(start_port=5001, max_tries=100):
+    hosts = ['127.0.0.1', 'localhost', '0.0.0.0']
+    for host in hosts:
+        try:
+            port = _find_free_port(start_port=start_port, max_tries=max_tries, host=host)
+        except Exception as e:
+            print(f"Failed to find free port on host {host}: {e}")
+            continue
+
+        # write the chosen port so the launcher can read it
+        _write_port_file(port)
+
+        try:
+            print(f"Attempting to start Flask app on {host}:{port}...")
+            app.run(host=host, port=port, debug=False, use_reloader=False)
+            return
+        except OSError as e:
+            print(f"OSError while starting Flask app on {host}:{port}: {e}")
+            # try next host/port
+            continue
+        except Exception as e:
+            print(f"Failed to start Flask app on {host}:{port}: {e}")
+            continue
+
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=False, use_reloader=False)
+    # try default port 5001 and fall back if it fails
+    _find_and_run(start_port=5001, max_tries=200)
