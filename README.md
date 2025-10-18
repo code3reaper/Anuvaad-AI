@@ -67,10 +67,12 @@ Anuvaad-AI is your one-stop multilingual content studio. It empowers creators, e
 ---
 
 ## 📸 Screenshots & Demo
+Here’s a quick look at the Anuvaad‑AI interface and its key modules 👇
 
 <div align="center">
 
 ### 🧭 **Dashboard Overview**
+Get an overview of your projects, recent activities, and quick access to all AI-powered tools. Clean, intuitive, and built for creators.
 
 ![Dashboard](https://github.com/code3reaper/Anuvaad-AI/blob/main/attached_assets/stock_images/Screenshots/Dashboard%201.png)
 ![Dashboard](https://github.com/code3reaper/Anuvaad-AI/blob/main/attached_assets/stock_images/Screenshots/Dashboard%202.png)
@@ -78,24 +80,29 @@ Anuvaad-AI is your one-stop multilingual content studio. It empowers creators, e
 
 
 ### 🎙️ **Dubbing Studio**
+Upload your videos and automatically dub them into multiple languages using ElevenLabs AI voices — with precise sync and tone matching.
 
 ![Dubbing Interface](https://github.com/code3reaper/Anuvaad-AI/blob/main/attached_assets/stock_images/Screenshots/Video%20Dubbing%201.png)
 ![Dubbing Interface](https://github.com/code3reaper/Anuvaad-AI/blob/main/attached_assets/stock_images/Screenshots/Video%20Dubbing%202.png)
 
 
 ### ✍️ **Word to Story**
+Turn simple words or ideas into full, creative stories using AI. Perfect for writers, educators, and content creators.
 
 ![Chat Interface](https://github.com/code3reaper/Anuvaad-AI/blob/main/attached_assets/stock_images/Screenshots/Word%20to%20Story.png)
 
 ### 📰 **Article to Podcast**
+Convert any article or blog post into a natural‑sounding podcast, complete with background music and human‑like narration.
 
 ![Dashboard](https://github.com/code3reaper/Anuvaad-AI/blob/main/attached_assets/stock_images/Screenshots/Article%20to%20Podcast.png)
 
 ### 📺 **YouTube Summarizer**
+Get AI‑generated summaries, transcripts, and insights from YouTube videos — ideal for researchers, learners, and professionals.
 
 ![Dubbing Interface](https://github.com/code3reaper/Anuvaad-AI/blob/main/attached_assets/stock_images/Screenshots/Youtube%20Summarizer.png)
 
 ### ❓ **FAQs**
+Find quick answers to common user queries, setup issues, and feature guides — all in one place.
 
 ![Chat Interface](https://github.com/code3reaper/Anuvaad-AI/blob/main/attached_assets/stock_images/Screenshots/FAQs.png)
 
