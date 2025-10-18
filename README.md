@@ -1,24 +1,15 @@
+<<<<<<< HEAD
 # 🎬 Anuvaad AI - AI-Powered Video Dubbing Platform
 
 Transform your videos across languages with professional AI dubbing, translation, and creative tools.
 
 ## ✨ Features
 
-- 🎥 **Video Dubbing** - AI-powered dubbing in 50+ languages
-- 📺 **YouTube Summarizer** - Get instant AI summaries of videos  
-- 📖 **Word to Story** - Transform words into creative stories
-- 🎙️ **Article to Podcast** - Convert articles to audio
-- 🗣️ **Text to Speech** - Natural voice synthesis
-- 🎤 **Speech to Text** - Accurate transcription
-- 🌐 **Text Translation** - AI-powered translation
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- Python 3.10+
-- Node.js 18+
-- FFmpeg
 
 ### Installation
 
@@ -93,17 +84,9 @@ See `setup_guide.txt` for detailed setup instructions and troubleshooting.
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React + Vite
-- **Backend**: Flask (Python)
-- **AI**: ElevenLabs + Google Gemini
-- **Processing**: MoviePy, FFmpeg, Pydub
 
 ## 💡 Usage Tips
 
-- First-time setup takes 2-5 minutes (dependency installation)
-- Video processing is resource-intensive
-- Requires stable internet for AI APIs
-- Keep your `.env` file secure
 
 ## 🐛 Common Issues
 
@@ -122,6 +105,9 @@ Stop other apps using ports 5000/5001
 
 All rights reserved.
 
----
 
 Made with ❤️ by Anuvaad AI Team
+=======
+# Anuvaad-AI
+AI-powered multilingual video dubbing, TTS, transcription and translation application
+>>>>>>> origin/main
