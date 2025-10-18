@@ -66,19 +66,31 @@ Anuvaad-AI is your one-stop multilingual content studio. It empowers creators, e
 
 ---
 
-## 🌟 Screenshots & Demo
+## 📸 Screenshots & Demo
 
 <div align="center">
 
-### 🏠 **Dashboard Overview**
+### 🧭 **Dashboard Overview**
 
 ![Dashboard](https://github.com/code3reaper/Anuvaad-AI/blob/main/screenshots/dashboard.png)
 
-### 🎧 **Dubbing Studio**
+### 🎙️ **Dubbing Studio**
 
 ![Dubbing Interface](https://github.com/code3reaper/Anuvaad-AI/blob/main/screenshots/dubbing_studio.png)
 
-### 💬 **AI Translator & Chat**
+### ✍️ **Word to Story**
+
+![Chat Interface](https://github.com/code3reaper/Anuvaad-AI/blob/main/screenshots/chat_interface.png)
+
+### 📰 **Article to Podcast**
+
+![Dashboard](https://github.com/code3reaper/Anuvaad-AI/blob/main/screenshots/dashboard.png)
+
+### 📺 **YouTube Summarizer**
+
+![Dubbing Interface](https://github.com/code3reaper/Anuvaad-AI/blob/main/screenshots/dubbing_studio.png)
+
+### ❓ **FAQs**
 
 ![Chat Interface](https://github.com/code3reaper/Anuvaad-AI/blob/main/screenshots/chat_interface.png)
 
@@ -324,7 +336,7 @@ MIT License — Free to use, modify, and distribute with attribution.
 
 🐛 Report issues on GitHub
 
-💌 Email: [prakhar.244710@gmail.com](mailto:prakhar.244710@gmail.com)
+💌 Email: [support@anuvaad-ai.com](mailto:support@anuvaad-ai.com)
 
 </div>
 
