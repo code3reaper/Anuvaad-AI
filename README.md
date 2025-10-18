@@ -72,27 +72,32 @@ Anuvaad-AI is your one-stop multilingual content studio. It empowers creators, e
 
 ### 🧭 **Dashboard Overview**
 
-![Dashboard](https://github.com/code3reaper/Anuvaad-AI/blob/main/screenshots/dashboard.png)
+![Dashboard](https://github.com/code3reaper/Anuvaad-AI/blob/main/attached_assets/stock_images/Screenshots/Dashboard%201.png)
+![Dashboard](https://github.com/code3reaper/Anuvaad-AI/blob/main/attached_assets/stock_images/Screenshots/Dashboard%202.png)
+![Dashboard](https://github.com/code3reaper/Anuvaad-AI/blob/main/attached_assets/stock_images/Screenshots/Dashboard%203.png)
+
 
 ### 🎙️ **Dubbing Studio**
 
-![Dubbing Interface](https://github.com/code3reaper/Anuvaad-AI/blob/main/screenshots/dubbing_studio.png)
+![Dubbing Interface](https://github.com/code3reaper/Anuvaad-AI/blob/main/attached_assets/stock_images/Screenshots/Video%20Dubbing%201.png)
+![Dubbing Interface](https://github.com/code3reaper/Anuvaad-AI/blob/main/attached_assets/stock_images/Screenshots/Video%20Dubbing%202.png)
+
 
 ### ✍️ **Word to Story**
 
-![Chat Interface](https://github.com/code3reaper/Anuvaad-AI/blob/main/screenshots/chat_interface.png)
+![Chat Interface](https://github.com/code3reaper/Anuvaad-AI/blob/main/attached_assets/stock_images/Screenshots/Word%20to%20Story.png)
 
 ### 📰 **Article to Podcast**
 
-![Dashboard](https://github.com/code3reaper/Anuvaad-AI/blob/main/screenshots/dashboard.png)
+![Dashboard](https://github.com/code3reaper/Anuvaad-AI/blob/main/attached_assets/stock_images/Screenshots/Article%20to%20Podcast.png)
 
 ### 📺 **YouTube Summarizer**
 
-![Dubbing Interface](https://github.com/code3reaper/Anuvaad-AI/blob/main/screenshots/dubbing_studio.png)
+![Dubbing Interface](https://github.com/code3reaper/Anuvaad-AI/blob/main/attached_assets/stock_images/Screenshots/Youtube%20Summarizer.png)
 
 ### ❓ **FAQs**
 
-![Chat Interface](https://github.com/code3reaper/Anuvaad-AI/blob/main/screenshots/chat_interface.png)
+![Chat Interface](https://github.com/code3reaper/Anuvaad-AI/blob/main/attached_assets/stock_images/Screenshots/FAQs.png)
 
 </div>
 
