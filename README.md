@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <!--
 README for Anuvaad-AI
 This file is modeled after the Plant Care Pro sample the user provided.
@@ -286,4 +285,3 @@ Made with ❤️ by Anuvaad AI Team
 =======
 # Anuvaad-AI
 AI-powered multilingual video dubbing, TTS, transcription and translation application
->>>>>>> origin/main
